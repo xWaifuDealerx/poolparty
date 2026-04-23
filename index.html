@@ -670,6 +670,57 @@ footer {
 .footer-links a:hover { color: var(--accent-cyan); }
 
 
+
+/* ── Contract Address ── */
+.contract-address {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+  animation: fadeInUp 1s ease-out 0.7s both;
+}
+.ca-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+.ca-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background: rgba(13, 13, 31, 0.8);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  max-width: 100%;
+}
+.ca-box:hover {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 229, 255, 0.03);
+}
+.ca-text {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  color: var(--text-secondary);
+  word-break: break-all;
+  user-select: all;
+}
+.ca-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--accent-cyan);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 /* ── Staking ── */
 .staking-card {
   background: var(--bg-card);
@@ -882,7 +933,17 @@ footer {
   </div>
   <h1>Pool <span class="gradient">Party</span></h1>
   <p class="hero-sub">Pool together. Rise together. $POOL pairs with other tokens on Meteora to amplify visibility, deepen liquidity, and earn trading fees from arbitrage volume.</p>
-  <div class="hero-actions">
+  <div class="contract-address">
+      <span class="ca-label">Contract Address</span>
+      <div class="ca-box" onclick="copyCA()" id="caBox">
+        <span class="ca-text" id="caText">BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr</span>
+        <span class="ca-copy" id="caCopy">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy
+        </span>
+      </div>
+    </div>
+    <div class="hero-actions">
     <a href="https://app.meteora.ag/" target="_blank" class="btn-primary">Add Liquidity</a>
     <a href="#pools" class="btn-secondary">View Pools</a>
   </div>
@@ -987,7 +1048,7 @@ footer {
         <td class="pool-apy">—</td>
         <td class="pool-volume">$0</td>
         <td class="pool-volume">$0</td>
-        <td><a href="https://app.meteora.ag/" target="_blank" class="pool-action-btn">+ Add LP</a></td>
+        <td><a href="https://dexscreener.com/solana/9da2awni6brsepnxhqtvdhsqf37iz6t3amape6zlbdqh" target="_blank" class="pool-action-btn">View Pool</a></td>
       </tr>
       
     </tbody>
@@ -1016,10 +1077,10 @@ footer {
         </div>
         <div>
           <h3>$POOL Staking</h3>
-          <p class="staking-subtitle">Proof of Belief &middot; Powered by Printr</p>
+          <p class="staking-subtitle">Proof of Belief &middot; Live on Printr</p>
         </div>
       </div>
-      <a href="https://app.printr.money" target="_blank" class="btn-stake">Stake on Printr</a>
+      <a href="https://app.printr.money/trade/BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr?type=stake" target="_blank" class="btn-stake">Stake on Printr</a>
     </div>
     <div class="staking-stats">
       <div class="s-stat">
@@ -1063,7 +1124,7 @@ footer {
   <h2>Dive Into the<br><span style="background: var(--gradient-pool); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Pool Party</span></h2>
   <p>Add liquidity, earn fees, and help build the deepest liquidity layer for Printr tokens.</p>
   <div class="cta-buttons">
-    <a href="https://app.meteora.ag/" target="_blank" class="btn-primary">Add Liquidity on Meteora</a>
+    <a href="https://dexscreener.com/solana/9da2awni6brsepnxhqtvdhsqf37iz6t3amape6zlbdqh" target="_blank" class="btn-primary">View Pool on DexScreener</a>
     <a href="https://app.meteora.ag/" target="_blank" class="btn-secondary">Create New Pool</a>
   </div>
 </section>
@@ -1078,10 +1139,94 @@ footer {
     <a href="https://app.printr.money" target="_blank">Printr</a>
     <a href="https://app.meteora.ag/" target="_blank">Meteora</a>
     <a href="#">Docs</a>
-    <a href="#">Twitter</a>
+    <a href="https://x.com/printrpoolparty" target="_blank">Twitter</a>
   </div>
 </footer>
 
 </div>
+<script>
+const PAIR_ADDRESS = '9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH';
+const API_URL = `https://api.dexscreener.com/latest/dex/pairs/solana/${PAIR_ADDRESS}`;
+
+function formatUSD(num) {
+  if (num === null || num === undefined) return '$0';
+  if (num >= 1000000) return '$' + (num / 1000000).toFixed(1) + 'M';
+  if (num >= 1000) return '$' + (num / 1000).toFixed(1) + 'K';
+  return '$' + num.toFixed(0);
+}
+
+function formatPercent(num) {
+  if (num === null || num === undefined) return '—';
+  return (num >= 0 ? '+' : '') + num.toFixed(1) + '%';
+}
+
+async function fetchPoolData() {
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    const pair = data.pairs ? data.pairs[0] : data.pair;
+    if (!pair) return;
+
+    const tvl = pair.liquidity?.usd || 0;
+    const vol24 = pair.volume?.h24 || 0;
+    const priceChange = pair.priceChange?.h24 || 0;
+    const txns24 = (pair.txns?.h24?.buys || 0) + (pair.txns?.h24?.sells || 0);
+
+    // Update stats bar
+    const statValues = document.querySelectorAll('.stat-value');
+    if (statValues[0]) statValues[0].textContent = formatUSD(tvl);
+    if (statValues[2]) statValues[2].textContent = txns24.toLocaleString();
+
+    // Update pool table row
+    const tvlCell = document.querySelector('.pool-tvl');
+    if (tvlCell) tvlCell.textContent = formatUSD(tvl);
+
+    const volCell = document.querySelectorAll('.pool-volume');
+    if (volCell[0]) volCell[0].textContent = formatUSD(vol24);
+
+    const apyCell = document.querySelector('.pool-apy');
+    if (apyCell) {
+      apyCell.textContent = formatPercent(priceChange);
+      apyCell.style.color = priceChange >= 0 ? '#00ff88' : '#ff4466';
+    }
+
+    // Update marquee
+    const marqueeItems = document.querySelectorAll('.marquee-item');
+    marqueeItems.forEach(item => {
+      const text = item.textContent;
+      if (text.includes('TVL:')) item.innerHTML = 'TVL: ' + formatUSD(tvl);
+      if (text.includes('24h Volume:')) item.innerHTML = '24h Volume: ' + formatUSD(vol24);
+      if (text.includes('Arbitrage Trades:')) item.innerHTML = 'Trades (24h): ' + txns24.toLocaleString();
+    });
+
+    // Update green spans in marquee for price change
+    const greenSpans = document.querySelectorAll('.marquee-item .green');
+    greenSpans.forEach(span => {
+      span.textContent = formatPercent(priceChange);
+      span.style.color = priceChange >= 0 ? '#00ff88' : '#ff4466';
+    });
+
+  } catch (err) {
+    console.log('Could not fetch pool data:', err);
+  }
+}
+
+fetchPoolData();
+setInterval(fetchPoolData, 30000);
+</script>
+<script>
+function copyCA() {
+  const ca = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
+  navigator.clipboard.writeText(ca).then(() => {
+    const btn = document.getElementById('caCopy');
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Copied!';
+    btn.style.color = '#00ff88';
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy';
+      btn.style.color = '';
+    }, 2000);
+  });
+}
+</script>
 </body>
 </html>
