@@ -1080,20 +1080,20 @@ footer {
           <p class="staking-subtitle">Proof of Belief &middot; Live on Printr</p>
         </div>
       </div>
-      <a href="https://app.printr.money/trade/BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr?type=stake" target="_blank" class="btn-stake">Stake on Printr</a>
+      <a href="https://app.printr.money/trade/0x2c07e665041022b8b7247f82ce736eea6c48a4cf37370b0b6b327efad60af8f6?type=stake" target="_blank" class="btn-stake">Stake on Printr</a>
     </div>
     <div class="staking-stats">
       <div class="s-stat">
-        <div class="s-stat-val">$0</div>
-        <div class="s-stat-label">Total Staked</div>
-      </div>
-      <div class="s-stat">
-        <div class="s-stat-val">0</div>
-        <div class="s-stat-label">Stakers</div>
+        <div class="s-stat-val">—</div>
+        <div class="s-stat-label">Tokens Staked</div>
       </div>
       <div class="s-stat">
         <div class="s-stat-val">—</div>
-        <div class="s-stat-label">APY</div>
+        <div class="s-stat-label">USD Value</div>
+      </div>
+      <div class="s-stat">
+        <div class="s-stat-val">—</div>
+        <div class="s-stat-label">Stakers</div>
       </div>
       <div class="s-stat">
         <div class="s-stat-val">$0</div>
@@ -1124,8 +1124,7 @@ footer {
   <h2>Dive Into the<br><span style="background: var(--gradient-pool); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Pool Party</span></h2>
   <p>Add liquidity, earn fees, and help build the deepest liquidity layer for Printr tokens.</p>
   <div class="cta-buttons">
-    <a href="https://dexscreener.com/solana/9da2awni6brsepnxhqtvdhsqf37iz6t3amape6zlbdqh" target="_blank" class="btn-primary">View Pool on DexScreener</a>
-    <a href="https://app.meteora.ag/" target="_blank" class="btn-secondary">Create New Pool</a>
+    
   </div>
 </section>
 
@@ -1213,6 +1212,73 @@ async function fetchPoolData() {
 
 fetchPoolData();
 setInterval(fetchPoolData, 30000);
+</script>
+<script>
+const STAKING_ACCOUNT = '8AUMPAjfH6Zghw26oHDaip5ZbdYKKBVwBYVNS4yFepuz';
+const SOLANA_RPC = 'https://api.mainnet-beta.solana.com';
+const POOL_TOKEN = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
+
+async function fetchStakingData() {
+  try {
+    // 1. Get token balance from Solana RPC
+    const balanceRes = await fetch(SOLANA_RPC, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'getTokenAccountBalance',
+        params: [STAKING_ACCOUNT]
+      })
+    });
+    const balanceData = await balanceRes.json();
+    const tokenBalance = balanceData?.result?.value?.uiAmount || 0;
+    const decimals = balanceData?.result?.value?.decimals || 0;
+
+    // 2. Get price from DexScreener (using the pool pair we already track)
+    let priceUsd = 0;
+    try {
+      const priceRes = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${POOL_TOKEN}`);
+      const priceData = await priceRes.json();
+      if (priceData.pairs && priceData.pairs.length > 0) {
+        priceUsd = parseFloat(priceData.pairs[0].priceUsd) || 0;
+      }
+    } catch(e) {
+      console.log('Price fetch failed:', e);
+    }
+
+    const stakedUsd = tokenBalance * priceUsd;
+
+    // Format numbers
+    function fmtNum(n) {
+      if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
+      if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+      return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+    }
+    function fmtUsd(n) {
+      if (n >= 1000000) return '$' + (n / 1000000).toFixed(2) + 'M';
+      if (n >= 1000) return '$' + (n / 1000).toFixed(1) + 'K';
+      if (n >= 1) return '$' + n.toFixed(2);
+      if (n > 0) return '$' + n.toFixed(4);
+      return '$0';
+    }
+
+    // Update staking stats
+    const stakingStats = document.querySelectorAll('.s-stat-val');
+    if (stakingStats.length >= 4) {
+      stakingStats[0].textContent = fmtNum(tokenBalance) + ' $POOL';
+      stakingStats[1].textContent = fmtUsd(stakedUsd);
+      // stakingStats[2] = stakers (can't fetch without indexer)
+      // stakingStats[3] = fees distributed (can't fetch without indexer)
+    }
+
+  } catch (err) {
+    console.log('Could not fetch staking data:', err);
+  }
+}
+
+fetchStakingData();
+setInterval(fetchStakingData, 30000);
 </script>
 <script>
 function copyCA() {
