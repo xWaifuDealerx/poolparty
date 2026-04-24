@@ -1538,132 +1538,10 @@ fetchStakingData();
 setInterval(fetchStakingData, 30000);
 </script>
 
-<script>
-(async function fetchPooledPOOL() {
-  const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
-  const ADDR = '9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH';
-  const RPC = 'https://api.mainnet-beta.solana.com';
-
-  function fmtTokens(n) {
-    if (n >= 1000000000) return (n / 1000000000).toFixed(2) + 'B';
-    if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
-    if (n >= 1000) return Math.floor(n).toLocaleString();
-    return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  }
-
-  async function rpc(method, params) {
-    const res = await fetch(RPC, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params })
-    });
-    return await res.json();
-  }
-
-  async function tryFetch() {
-    // Method A: Maybe ADDR is itself a token account
-    try {
-      const data = await rpc('getTokenAccountBalance', [ADDR]);
-      if (data?.result?.value) {
-        const amount = data.result.value.uiAmount || 0;
-        if (amount > 0) {
-          document.getElementById('pooled401k').textContent = fmtTokens(amount) + ' $POOL';
-          return true;
-        }
-      }
-    } catch(e) {}
-
-    // Method B: ADDR owns token accounts
-    for (const prog of ['TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA', 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb']) {
-      try {
-        const data = await rpc('getTokenAccountsByOwner', [ADDR, { programId: prog }, { encoding: 'jsonParsed' }]);
-        for (const acct of (data?.result?.value || [])) {
-          const info = acct.account?.data?.parsed?.info;
-          if (info?.mint === POOL_MINT) {
-            const amount = info?.tokenAmount?.uiAmount || 0;
-            if (amount > 0) {
-              document.getElementById('pooled401k').textContent = fmtTokens(amount) + ' $POOL';
-              return true;
-            }
-          }
-        }
-      } catch(e) {}
-    }
-
-    // Method C: Mint filter
-    try {
-      const data = await rpc('getTokenAccountsByOwner', [ADDR, { mint: POOL_MINT }, { encoding: 'jsonParsed' }]);
-      for (const acct of (data?.result?.value || [])) {
-        const amount = acct.account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0;
-        if (amount > 0) {
-          document.getElementById('pooled401k').textContent = fmtTokens(amount) + ' $POOL';
-          return true;
-        }
-      }
-    } catch(e) {}
-
-    return false;
-  }
-
-  await tryFetch();
-  setInterval(tryFetch, 60000);
-})();
-</script>
 
 
-<script>
-(async function fetchPooledUP() {
-  const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
-  const ADDR = '7GQyJVGuWcCA2ax5pQruVqpJcm311oamLY28fZrw699s';
-  const RPC = 'https://api.mainnet-beta.solana.com';
 
-  function fmtTokens(n) {
-    if (n >= 1000000000) return (n / 1000000000).toFixed(2) + 'B';
-    if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
-    if (n >= 1000) return Math.floor(n).toLocaleString();
-    return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  }
 
-  async function rpc(method, params) {
-    const res = await fetch(RPC, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params })
-    });
-    return await res.json();
-  }
-
-  async function tryFetch() {
-    try {
-      const data = await rpc('getTokenAccountBalance', [ADDR]);
-      if (data?.result?.value) {
-        const amount = data.result.value.uiAmount || 0;
-        if (amount > 0) {
-          document.getElementById('pooledUP').textContent = fmtTokens(amount) + ' $POOL';
-          return true;
-        }
-      }
-    } catch(e) {}
-
-    for (const prog of ['TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA', 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb']) {
-      try {
-        const data = await rpc('getTokenAccountsByOwner', [ADDR, { programId: prog }, { encoding: 'jsonParsed' }]);
-        for (const acct of (data?.result?.value || [])) {
-          const info = acct.account?.data?.parsed?.info;
-          if (info?.mint === POOL_MINT) {
-            const amount = info?.tokenAmount?.uiAmount || 0;
-            if (amount > 0) { document.getElementById('pooledUP').textContent = fmtTokens(amount) + ' $POOL'; return true; }
-          }
-        }
-      } catch(e) {}
-    }
-    return false;
-  }
-
-  await tryFetch();
-  setInterval(tryFetch, 60000);
-})();
-</script>
 <script>
 (async function fetchMarketCaps() {
   const pairs = [
@@ -1702,11 +1580,19 @@ setInterval(fetchStakingData, 30000);
   setInterval(update, 30000);
 })();
 </script>
+
+
 <script>
-(async function fetchPooledBELIEF() {
-  const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
-  const ADDR = 'CDGDzTGTtgHDLUv3rmshxRnceLCzA2Ni6qG9dUYRqyZM';
+(async function fetchAllPoolBalances() {
   const RPC = 'https://api.mainnet-beta.solana.com';
+  const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
+
+  const pools = [
+    { addr: '9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH', el: 'pooled401k', name: '401K' },
+    { addr: '7GQyJVGuWcCA2ax5pQruVqpJcm311oamLY28fZrw699s', el: 'pooledUP', name: 'UP' },
+    { addr: 'CDGDzTGTtgHDLUv3rmshxRnceLCzA2Ni6qG9dUYRqyZM', el: 'pooledBELIEF', name: 'BELIEF' },
+    { addr: 'AJf4cwe5mdppPn6RtHRdsdVZvuALakJ9tswmFVuf8cxV', el: 'pooledFACAI', name: 'FACAI' },
+  ];
 
   function fmtTokens(n) {
     if (n >= 1000000000) return (n / 1000000000).toFixed(2) + 'B';
@@ -1715,97 +1601,99 @@ setInterval(fetchStakingData, 30000);
     return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
   }
 
-  async function rpc(method, params) {
+  async function rpcCall(method, params) {
     const res = await fetch(RPC, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params })
+      body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method, params })
     });
     return await res.json();
   }
 
-  async function tryFetch() {
+  async function fetchOne(pool) {
+    const el = document.getElementById(pool.el);
+    if (!el) return;
+
+    // Step 1: Check what kind of account this is
     try {
-      const data = await rpc('getTokenAccountBalance', [ADDR]);
-      if (data?.result?.value) {
-        const amount = data.result.value.uiAmount || 0;
-        if (amount > 0) {
-          document.getElementById('pooledBELIEF').textContent = fmtTokens(amount) + ' $POOL';
-          return true;
+      const acctInfo = await rpcCall('getAccountInfo', [pool.addr, { encoding: 'jsonParsed' }]);
+      const owner = acctInfo?.result?.value?.owner || 'unknown';
+      const parsed = acctInfo?.result?.value?.data?.parsed;
+      console.log(`[${pool.name}] Account owner: ${owner}`);
+
+      // If it's a token account, we can read balance directly
+      if (parsed?.type === 'account' && parsed?.info?.mint) {
+        const mint = parsed.info.mint;
+        const amount = parsed.info.tokenAmount?.uiAmount || 0;
+        console.log(`[${pool.name}] Is token account. Mint: ${mint}, Balance: ${amount}`);
+        if (mint === POOL_MINT && amount > 0) {
+          el.textContent = fmtTokens(amount) + ' $POOL';
+          return;
+        } else if (amount > 0) {
+          // This is a token account but not for POOL - it holds another token
+          console.log(`[${pool.name}] Holds different token, not POOL`);
         }
       }
-    } catch(e) {}
 
-    for (const prog of ['TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA', 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb']) {
-      try {
-        const data = await rpc('getTokenAccountsByOwner', [ADDR, { programId: prog }, { encoding: 'jsonParsed' }]);
-        for (const acct of (data?.result?.value || [])) {
-          const info = acct.account?.data?.parsed?.info;
-          if (info?.mint === POOL_MINT) {
-            const amount = info?.tokenAmount?.uiAmount || 0;
-            if (amount > 0) { document.getElementById('pooledBELIEF').textContent = fmtTokens(amount) + ' $POOL'; return true; }
+      // If it's owned by Token Program, try getTokenAccountBalance
+      if (owner === 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' || 
+          owner === 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb') {
+        try {
+          const bal = await rpcCall('getTokenAccountBalance', [pool.addr]);
+          const amount = bal?.result?.value?.uiAmount || 0;
+          console.log(`[${pool.name}] getTokenAccountBalance: ${amount}`);
+          if (amount > 0) {
+            el.textContent = fmtTokens(amount) + ' $POOL';
+            return;
           }
-        }
-      } catch(e) {}
-    }
-    return false;
-  }
-
-  await tryFetch();
-  setInterval(tryFetch, 60000);
-})();
-</script>
-<script>
-(async function fetchPooledFACAI() {
-  const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
-  const ADDR = 'AJf4cwe5mdppPn6RtHRdsdVZvuALakJ9tswmFVuf8cxV';
-  const RPC = 'https://api.mainnet-beta.solana.com';
-
-  function fmtTokens(n) {
-    if (n >= 1000000000) return (n / 1000000000).toFixed(2) + 'B';
-    if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
-    if (n >= 1000) return Math.floor(n).toLocaleString();
-    return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  }
-
-  async function rpc(method, params) {
-    const res = await fetch(RPC, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params })
-    });
-    return await res.json();
-  }
-
-  async function tryFetch() {
-    try {
-      const data = await rpc('getTokenAccountBalance', [ADDR]);
-      if (data?.result?.value) {
-        const amount = data.result.value.uiAmount || 0;
-        if (amount > 0) {
-          document.getElementById('pooledFACAI').textContent = fmtTokens(amount) + ' $POOL';
-          return true;
+        } catch(e) {
+          console.log(`[${pool.name}] getTokenAccountBalance failed:`, e.message);
         }
       }
-    } catch(e) {}
 
-    for (const prog of ['TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA', 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb']) {
-      try {
-        const data = await rpc('getTokenAccountsByOwner', [ADDR, { programId: prog }, { encoding: 'jsonParsed' }]);
-        for (const acct of (data?.result?.value || [])) {
-          const info = acct.account?.data?.parsed?.info;
-          if (info?.mint === POOL_MINT) {
+      // If it's a program account or other, try getTokenAccountsByOwner
+      console.log(`[${pool.name}] Trying getTokenAccountsByOwner...`);
+      for (const prog of ['TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA', 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb']) {
+        try {
+          const data = await rpcCall('getTokenAccountsByOwner', [pool.addr, { programId: prog }, { encoding: 'jsonParsed' }]);
+          const accounts = data?.result?.value || [];
+          console.log(`[${pool.name}] Found ${accounts.length} token accounts with program ${prog.substring(0,8)}...`);
+          for (const acct of accounts) {
+            const info = acct.account?.data?.parsed?.info;
+            const mint = info?.mint || '';
             const amount = info?.tokenAmount?.uiAmount || 0;
-            if (amount > 0) { document.getElementById('pooledFACAI').textContent = fmtTokens(amount) + ' $POOL'; return true; }
+            console.log(`[${pool.name}]   Token: ${mint.substring(0,8)}... Amount: ${amount}`);
+            if (mint === POOL_MINT && amount > 0) {
+              el.textContent = fmtTokens(amount) + ' $POOL';
+              return;
+            }
           }
+        } catch(e) {
+          console.log(`[${pool.name}] getTokenAccountsByOwner failed for ${prog.substring(0,8)}:`, e.message);
         }
-      } catch(e) {}
+      }
+
+      // If nothing worked, check if RPC returned an error
+      if (acctInfo?.error) {
+        console.log(`[${pool.name}] RPC error:`, acctInfo.error);
+      }
+
+    } catch(e) {
+      console.log(`[${pool.name}] Complete failure:`, e.message);
     }
-    return false;
   }
 
-  await tryFetch();
-  setInterval(tryFetch, 60000);
+  async function fetchAll() {
+    // Fetch sequentially to avoid rate limits
+    for (const pool of pools) {
+      await fetchOne(pool);
+      // Small delay between calls to avoid rate limiting
+      await new Promise(r => setTimeout(r, 500));
+    }
+  }
+
+  await fetchAll();
+  setInterval(fetchAll, 60000);
 })();
 </script>
 <script>
