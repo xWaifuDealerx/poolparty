@@ -1144,7 +1144,7 @@ footer {
     <thead>
       <tr>
         <th>Token</th>
-        <th>$POOL Pooled</th>
+        <th>Tokens Pooled</th>
         <th></th>
       </tr>
     </thead>
@@ -1487,52 +1487,117 @@ setInterval(fetchStakingData, 30000);
 <script>
 const LP_ADDRESS = '9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH';
 const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
+const RPC_URL = 'https://api.mainnet-beta.solana.com';
 
 async function fetchPooledAmount() {
   try {
-    const res = await fetch('https://api.mainnet-beta.solana.com', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'getTokenAccountsByOwner',
-        params: [
-          LP_ADDRESS,
-          { programId: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' },
-          { encoding: 'jsonParsed' }
-        ]
-      })
-    });
-    const data = await res.json();
-    const accounts = data?.result?.value || [];
+    // Try multiple approaches to find token balances
 
-    for (const acct of accounts) {
-      const info = acct.account?.data?.parsed?.info;
-      const mint = info?.mint || '';
-      const amount = info?.tokenAmount?.uiAmount || 0;
+    // Approach 1: getTokenAccountsByOwner
+    let found = false;
+    try {
+      const res = await fetch(RPC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'getTokenAccountsByOwner',
+          params: [
+            LP_ADDRESS,
+            { programId: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' },
+            { encoding: 'jsonParsed' }
+          ]
+        })
+      });
+      const data = await res.json();
+      const accounts = data?.result?.value || [];
 
-      if (mint === POOL_MINT && amount > 0) {
-        function fmtTokens(n) {
-          if (n >= 1000000000) return (n / 1000000000).toFixed(2) + 'B';
-          if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
-          if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
-          return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+      for (const acct of accounts) {
+        const info = acct.account?.data?.parsed?.info;
+        const mint = info?.mint || '';
+        const amount = info?.tokenAmount?.uiAmount || 0;
+        // Find any token that is NOT $POOL (that's the 401K)
+        if (mint !== POOL_MINT && amount > 0) {
+          updatePooledDisplay(amount);
+          found = true;
+          break;
         }
+      }
+    } catch(e) {
+      console.log('Approach 1 failed:', e);
+    }
 
-        const el = document.getElementById('pooled401k');
-        if (el) el.textContent = fmtTokens(amount) + ' $POOL';
-        break;
+    // Approach 2: If approach 1 didn't find it, try fetching via Solscan API
+    if (!found) {
+      try {
+        const res = await fetch(`https://api.solscan.io/v2/account/token_accounts?address=${LP_ADDRESS}`, {
+          headers: { 'Accept': 'application/json' }
+        });
+        const data = await res.json();
+        const tokens = data?.data || [];
+        for (const token of tokens) {
+          if (token.token_address !== POOL_MINT) {
+            const amount = token.token_amount?.uiAmount || parseFloat(token.amount) / Math.pow(10, token.token_decimals || 0);
+            if (amount > 0) {
+              updatePooledDisplay(amount);
+              found = true;
+              break;
+            }
+          }
+        }
+      } catch(e) {
+        console.log('Approach 2 failed:', e);
       }
     }
+
+    // Approach 3: Use DexScreener pair data as fallback
+    if (!found) {
+      try {
+        const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH');
+        const data = await res.json();
+        const pair = data.pairs ? data.pairs[0] : data.pair;
+        if (pair) {
+          // Use liquidity data to estimate
+          const baseToken = pair.baseToken;
+          const quoteToken = pair.quoteToken;
+          // Find which one is NOT pool
+          let reserveAmount = 0;
+          if (baseToken?.address !== POOL_MINT) {
+            reserveAmount = parseFloat(pair.liquidity?.base) || 0;
+          } else if (quoteToken?.address !== POOL_MINT) {
+            reserveAmount = parseFloat(pair.liquidity?.quote) || 0;
+          }
+          if (reserveAmount > 0) {
+            updatePooledDisplay(reserveAmount);
+            found = true;
+          }
+        }
+      } catch(e) {
+        console.log('Approach 3 failed:', e);
+      }
+    }
+
   } catch (err) {
     console.log('Could not fetch pooled amount:', err);
   }
 }
 
+function updatePooledDisplay(amount) {
+  function fmtTokens(n) {
+    if (n >= 1000000000) return (n / 1000000000).toFixed(2) + 'B';
+    if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
+    if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+    return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  }
+  const el = document.getElementById('pooled401k');
+  if (el) el.textContent = fmtTokens(amount) + ' $401K';
+}
+
 fetchPooledAmount();
 setInterval(fetchPooledAmount, 30000);
 </script>
+
 
 <script>
 function copyCA() {
