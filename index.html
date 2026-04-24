@@ -1479,23 +1479,33 @@ setInterval(fetchPoolData, 30000);
 </script>
 <script>
 const STAKING_ACCOUNT = '8AUMPAjfH6Zghw26oHDaip5ZbdYKKBVwBYVNS4yFepuz';
-const SOLANA_RPC = 'https://api.mainnet-beta.solana.com';
+const SOLANA_RPC = 'https://rpc.ankr.com/solana';
 const POOL_TOKEN_ADDR = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
 const POOL_PRICE_PAIR = 'BshPsiAgXjbAdpuBKG6AM5d6yB2TYyfxefQDCWTzsRDy';
 
 async function fetchStakingData() {
   try {
-    const balanceRes = await fetch(SOLANA_RPC, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'getTokenAccountBalance',
-        params: [STAKING_ACCOUNT]
-      })
-    });
-    const balanceData = await balanceRes.json();
+    const stakingRpcs = ['https://rpc.ankr.com/solana', 'https://solana-mainnet.g.alchemy.com/v2/demo'];
+    let balanceData = null;
+    for (const rpc of stakingRpcs) {
+      try {
+        const balanceRes = await fetch(rpc, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'getTokenAccountBalance',
+            params: [STAKING_ACCOUNT]
+          })
+        });
+        if (balanceRes.ok) {
+          balanceData = await balanceRes.json();
+          if (!balanceData.error) break;
+        }
+      } catch(e) { console.log('Staking RPC failed:', rpc); }
+    }
+    if (!balanceData) return;
     const tokenBalance = balanceData?.result?.value?.uiAmount || 0;
 
     // Get price
@@ -1584,7 +1594,12 @@ setInterval(fetchStakingData, 30000);
 
 <script>
 (async function fetchAllPoolBalances() {
-  const RPC = 'https://api.mainnet-beta.solana.com';
+  const RPCS = [
+    'https://mainnet.helius-rpc.com/?api-key=1d8740dc-e5f4-421c-b823-e1bad1889ede',
+    'https://solana-mainnet.g.alchemy.com/v2/demo',
+    'https://rpc.ankr.com/solana',
+  ];
+  let RPC = RPCS[0];
   const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
 
   const pools = [
@@ -1602,12 +1617,23 @@ setInterval(fetchStakingData, 30000);
   }
 
   async function rpcCall(method, params) {
-    const res = await fetch(RPC, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method, params })
-    });
-    return await res.json();
+    for (const rpcUrl of RPCS) {
+      try {
+        const res = await fetch(rpcUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method, params })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (!data.error) { RPC = rpcUrl; return data; }
+          console.log('RPC returned error:', rpcUrl, data.error);
+        }
+      } catch(e) {
+        console.log('RPC failed:', rpcUrl, e.message);
+      }
+    }
+    return { error: 'All RPCs failed' };
   }
 
   async function fetchOne(pool) {
