@@ -526,6 +526,29 @@ section {
   margin-top: 2px;
 }
 
+
+/* ── Sort Headers ── */
+.pool-table thead th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s;
+  position: relative;
+  white-space: nowrap;
+}
+.pool-table thead th.sortable:hover {
+  color: var(--accent-cyan);
+}
+.pool-table thead th .sort-arrow {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 10px;
+  opacity: 0.3;
+  transition: opacity 0.2s;
+}
+.pool-table thead th.active .sort-arrow {
+  opacity: 1;
+  color: var(--accent-cyan);
+}
 .pool-mcap {
   font-family: 'Space Mono', monospace;
   font-weight: 700;
@@ -1071,7 +1094,7 @@ footer {
       </div>
     </div>
     <h1>Pool <span class="gradient">Party</span></h1>
-  <p class="hero-sub">Pool together. Rise together. $POOL pairs with other tokens on Meteora to amplify visibility, deepen liquidity, and earn trading fees from arbitrage volume.</p>
+  <p class="hero-sub">Pool together. Print together. $POOL pairs with other tokens on Meteora to amplify visibility, deepen liquidity, and earn trading fees from arbitrage volume.</p>
   <div class="contract-address">
       <span class="ca-label">Contract Address</span>
       <div class="ca-box" onclick="copyCA()" id="caBox">
@@ -1151,13 +1174,13 @@ footer {
     <thead>
       <tr>
         <th>Token</th>
-        <th>Market Cap</th>
-        <th>$POOL in Pool</th>
+        <th class="sortable active" data-sort="mcap" onclick="sortTable('mcap')">Market Cap <span class="sort-arrow">▼</span></th>
+        <th class="sortable" data-sort="pool" onclick="sortTable('pool')">$POOL in Pool <span class="sort-arrow">▼</span></th>
         <th></th>
       </tr>
     </thead>
     <tbody>
-      <tr class="pool-row">
+      <tr class="pool-row" >
         <td>
           <div class="pool-pair">
             <div class="pool-pair-icons">
@@ -1595,12 +1618,12 @@ setInterval(fetchStakingData, 30000);
 <script>
 (async function fetchAllPoolBalances() {
   const RPCS = [
-    'https://mainnet.helius-rpc.com/?api-key=1d8740dc-e5f4-421c-b823-e1bad1889ede',
-    'https://solana-mainnet.g.alchemy.com/v2/demo',
     'https://rpc.ankr.com/solana',
+    'https://solana-mainnet.g.alchemy.com/v2/demo',
   ];
-  let RPC = RPCS[0];
+  let currentRpc = RPCS[0];
   const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
+  const METEORA_PROGRAM = 'cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG';
 
   const pools = [
     { addr: '9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH', el: 'pooled401k', name: '401K' },
@@ -1626,101 +1649,287 @@ setInterval(fetchStakingData, 30000);
         });
         if (res.ok) {
           const data = await res.json();
-          if (!data.error) { RPC = rpcUrl; return data; }
-          console.log('RPC returned error:', rpcUrl, data.error);
+          if (!data.error) return data;
         }
-      } catch(e) {
-        console.log('RPC failed:', rpcUrl, e.message);
-      }
+      } catch(e) {}
     }
-    return { error: 'All RPCs failed' };
+    return null;
+  }
+
+  // Base58 encoder
+  function b58encode(bytes) {
+    const A = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    let num = 0n;
+    for (const b of bytes) num = num * 256n + BigInt(b);
+    let result = '';
+    while (num > 0n) { result = A[Number(num % 58n)] + result; num /= 58n; }
+    for (const b of bytes) { if (b === 0) result = '1' + result; else break; }
+    return result;
   }
 
   async function fetchOne(pool) {
     const el = document.getElementById(pool.el);
     if (!el) return;
 
-    // Step 1: Check what kind of account this is
     try {
+      // Step 1: Determine account type
       const acctInfo = await rpcCall('getAccountInfo', [pool.addr, { encoding: 'jsonParsed' }]);
-      const owner = acctInfo?.result?.value?.owner || 'unknown';
-      const parsed = acctInfo?.result?.value?.data?.parsed;
-      console.log(`[${pool.name}] Account owner: ${owner}`);
-
-      // If it's a token account, we can read balance directly
-      if (parsed?.type === 'account' && parsed?.info?.mint) {
-        const mint = parsed.info.mint;
-        const amount = parsed.info.tokenAmount?.uiAmount || 0;
-        console.log(`[${pool.name}] Is token account. Mint: ${mint}, Balance: ${amount}`);
-        if (mint === POOL_MINT && amount > 0) {
-          el.textContent = fmtTokens(amount) + ' $POOL';
-          return;
-        } else if (amount > 0) {
-          // This is a token account but not for POOL - it holds another token
-          console.log(`[${pool.name}] Holds different token, not POOL`);
-        }
+      if (!acctInfo || !acctInfo.result || !acctInfo.result.value) {
+        console.log('[' + pool.name + '] Account not found');
+        return;
       }
 
-      // If it's owned by Token Program, try getTokenAccountBalance
+      const owner = acctInfo.result.value.owner;
+      const parsed = acctInfo.result.value.data?.parsed;
+
+      // CASE 1: Token account - read directly
       if (owner === 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' || 
           owner === 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb') {
-        try {
-          const bal = await rpcCall('getTokenAccountBalance', [pool.addr]);
-          const amount = bal?.result?.value?.uiAmount || 0;
-          console.log(`[${pool.name}] getTokenAccountBalance: ${amount}`);
+        if (parsed && parsed.info && parsed.info.tokenAmount) {
+          const amount = parsed.info.tokenAmount.uiAmount || 0;
+          console.log('[' + pool.name + '] Token account, balance: ' + amount);
           if (amount > 0) {
             el.textContent = fmtTokens(amount) + ' $POOL';
             return;
           }
-        } catch(e) {
-          console.log(`[${pool.name}] getTokenAccountBalance failed:`, e.message);
         }
       }
 
-      // If it's a program account or other, try getTokenAccountsByOwner
-      console.log(`[${pool.name}] Trying getTokenAccountsByOwner...`);
-      for (const prog of ['TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA', 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb']) {
-        try {
-          const data = await rpcCall('getTokenAccountsByOwner', [pool.addr, { programId: prog }, { encoding: 'jsonParsed' }]);
-          const accounts = data?.result?.value || [];
-          console.log(`[${pool.name}] Found ${accounts.length} token accounts with program ${prog.substring(0,8)}...`);
-          for (const acct of accounts) {
-            const info = acct.account?.data?.parsed?.info;
-            const mint = info?.mint || '';
-            const amount = info?.tokenAmount?.uiAmount || 0;
-            console.log(`[${pool.name}]   Token: ${mint.substring(0,8)}... Amount: ${amount}`);
-            if (mint === POOL_MINT && amount > 0) {
-              el.textContent = fmtTokens(amount) + ' $POOL';
-              return;
-            }
+      // CASE 2: Meteora pool - extract vault addresses from binary data
+      if (owner === METEORA_PROGRAM) {
+        console.log('[' + pool.name + '] Meteora pool detected. Extracting vaults...');
+        
+        const rawInfo = await rpcCall('getAccountInfo', [pool.addr, { encoding: 'base64' }]);
+        if (!rawInfo?.result?.value?.data) return;
+        
+        const b64 = rawInfo.result.value.data[0];
+        const raw = atob(b64);
+        const bytes = new Uint8Array(raw.length);
+        for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+        
+        console.log('[' + pool.name + '] Account data size: ' + bytes.length + ' bytes');
+        
+        // Extract all 32-byte pubkeys from the account data
+        // DAMM v2 pool has pubkeys at fixed positions after the 8-byte discriminator
+        // Typical layout: discriminator(8) + various pubkeys and values
+        // We look for pubkeys and check if any are POOL token vaults
+        
+        const checked = new Set();
+        const pubkeys = [];
+        
+        // Read pubkeys at 32-byte aligned offsets starting from byte 8
+        for (let off = 8; off + 32 <= bytes.length; off += 32) {
+          const pk = b58encode(bytes.slice(off, off + 32));
+          if (pk.length >= 32 && pk.length <= 44 && !checked.has(pk)) {
+            checked.add(pk);
+            pubkeys.push({ offset: off, addr: pk });
           }
-        } catch(e) {
-          console.log(`[${pool.name}] getTokenAccountsByOwner failed for ${prog.substring(0,8)}:`, e.message);
+        }
+        
+        // Also try non-aligned positions common in Borsh-encoded structs
+        for (let off = 8; off + 32 <= bytes.length; off++) {
+          const pk = b58encode(bytes.slice(off, off + 32));
+          if (pk.length >= 32 && pk.length <= 44 && !checked.has(pk)) {
+            checked.add(pk);
+            pubkeys.push({ offset: off, addr: pk });
+          }
+        }
+        
+        console.log('[' + pool.name + '] Extracted ' + pubkeys.length + ' unique pubkeys');
+        
+        // Check each pubkey: is it a token account holding POOL tokens?
+        for (const pk of pubkeys) {
+          if (pk.addr === pool.addr || pk.addr === POOL_MINT) continue;
+          if (pk.addr === '11111111111111111111111111111111') continue;
+          
+          try {
+            const info = await rpcCall('getAccountInfo', [pk.addr, { encoding: 'jsonParsed' }]);
+            const p = info?.result?.value?.data?.parsed;
+            if (p && p.type === 'account' && p.info) {
+              if (p.info.mint === POOL_MINT) {
+                const amount = p.info.tokenAmount?.uiAmount || 0;
+                console.log('[' + pool.name + '] FOUND POOL vault at offset ' + pk.offset + ': ' + pk.addr + ' = ' + amount);
+                if (amount > 0) {
+                  el.textContent = fmtTokens(amount) + ' $POOL';
+                  // Cache this vault address for future lookups
+                  pool.vaultAddr = pk.addr;
+                  return;
+                }
+              }
+            }
+          } catch(e) {}
+          
+          // Small delay to avoid rate limits
+          await new Promise(r => setTimeout(r, 100));
         }
       }
 
-      // If nothing worked, check if RPC returned an error
-      if (acctInfo?.error) {
-        console.log(`[${pool.name}] RPC error:`, acctInfo.error);
-      }
+      console.log('[' + pool.name + '] Could not find POOL balance');
 
     } catch(e) {
-      console.log(`[${pool.name}] Complete failure:`, e.message);
+      console.log('[' + pool.name + '] Error:', e.message);
     }
   }
 
-  async function fetchAll() {
-    // Fetch sequentially to avoid rate limits
+  // Quick re-fetch using cached vault addresses
+  async function quickFetch(pool) {
+    if (!pool.vaultAddr) return fetchOne(pool);
+    const el = document.getElementById(pool.el);
+    if (!el) return;
+    try {
+      const info = await rpcCall('getAccountInfo', [pool.vaultAddr, { encoding: 'jsonParsed' }]);
+      const amount = info?.result?.value?.data?.parsed?.info?.tokenAmount?.uiAmount || 0;
+      if (amount > 0) el.textContent = fmtTokens(amount) + ' $POOL';
+    } catch(e) { pool.vaultAddr = null; }
+  }
+
+  // Initial fetch - full scan
+  for (const pool of pools) {
+    await fetchOne(pool);
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  // Subsequent fetches - use cached vaults when available
+  setInterval(async () => {
     for (const pool of pools) {
-      await fetchOne(pool);
-      // Small delay between calls to avoid rate limiting
-      await new Promise(r => setTimeout(r, 500));
+      await quickFetch(pool);
+      await new Promise(r => setTimeout(r, 300));
     }
+  }, 60000);
+})();
+</script>
+<script>
+// Sort state
+let currentSort = 'pool'; // default sort by pool amount
+let sortDir = 'desc';
+
+// Store raw values for sorting
+const poolData = {
+  '401k': { mcap: 0, pool: 0 },
+  'UP': { mcap: 0, pool: 0 },
+  'BELIEF': { mcap: 0, pool: 0 },
+  'FACAI': { mcap: 0, pool: 0 },
+};
+
+// Map element IDs to pool keys
+const mcapMap = { 'mcap401k': '401k', 'mcapUP': 'UP', 'mcapBELIEF': 'BELIEF', 'mcapFACAI': 'FACAI' };
+const poolMap = { 'pooled401k': '401k', 'pooledUP': 'UP', 'pooledBELIEF': 'BELIEF', 'pooledFACAI': 'FACAI' };
+
+// Observe changes to mcap and pool elements to capture raw values
+function observeValues() {
+  const observer = new MutationObserver(() => {
+    // Read mcap values
+    for (const [elId, key] of Object.entries(mcapMap)) {
+      const el = document.getElementById(elId);
+      if (el) {
+        const text = el.textContent.trim();
+        poolData[key].mcap = parseDisplayValue(text);
+      }
+    }
+    // Read pool values
+    for (const [elId, key] of Object.entries(poolMap)) {
+      const el = document.getElementById(elId);
+      if (el) {
+        const text = el.textContent.trim();
+        poolData[key].pool = parseDisplayValue(text);
+      }
+    }
+    // Re-sort after data update
+    doSort();
+  });
+
+  // Observe all relevant elements
+  for (const id of [...Object.keys(mcapMap), ...Object.keys(poolMap)]) {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el, { childList: true, characterData: true, subtree: true });
+  }
+}
+
+function parseDisplayValue(text) {
+  if (!text || text === '—' || text === '—') return 0;
+  text = text.replace(/[^0-9.,KMBkmb~$]/g, '').replace(/,/g, '').replace('$', '');
+  if (!text) return 0;
+  const multiplier = text.match(/[BbGg]/) ? 1e9 : text.match(/[Mm]/) ? 1e6 : text.match(/[Kk]/) ? 1e3 : 1;
+  const num = parseFloat(text.replace(/[KMBkmbGg]/gi, ''));
+  return isNaN(num) ? 0 : num * multiplier;
+}
+
+function sortTable(field) {
+  if (currentSort === field) {
+    sortDir = sortDir === 'desc' ? 'asc' : 'desc';
+  } else {
+    currentSort = field;
+    sortDir = 'desc';
   }
 
-  await fetchAll();
-  setInterval(fetchAll, 60000);
-})();
+  // Update header styles
+  document.querySelectorAll('.pool-table thead th.sortable').forEach(th => {
+    th.classList.remove('active');
+    th.querySelector('.sort-arrow').textContent = '▼';
+  });
+  const activeHeader = document.querySelector('[data-sort="' + field + '"]');
+  if (activeHeader) {
+    activeHeader.classList.add('active');
+    activeHeader.querySelector('.sort-arrow').textContent = sortDir === 'desc' ? '▼' : '▲';
+  }
+
+  doSort();
+}
+
+function doSort() {
+  const tbody = document.querySelector('.pool-table tbody');
+  if (!tbody) return;
+  
+  const rows = Array.from(tbody.querySelectorAll('.pool-row'));
+  
+  // Map each row to its pool key by finding the pair-name text
+  const rowKeyMap = {
+    '$401K': '401k',
+    '$UP': 'UP',
+    '$BELIEF': 'BELIEF',
+    '$发财': 'FACAI',
+  };
+  
+  rows.sort((a, b) => {
+    const nameA = a.querySelector('.pair-name')?.textContent?.trim() || '';
+    const nameB = b.querySelector('.pair-name')?.textContent?.trim() || '';
+    const keyA = rowKeyMap[nameA] || '';
+    const keyB = rowKeyMap[nameB] || '';
+    const valA = poolData[keyA]?.[currentSort] || 0;
+    const valB = poolData[keyB]?.[currentSort] || 0;
+    
+    return sortDir === 'desc' ? valB - valA : valA - valB;
+  });
+
+  // Re-append sorted rows
+  rows.forEach(row => tbody.appendChild(row));
+}
+
+// Initialize
+window.addEventListener('load', () => {
+  // Default sort by pool amount descending
+  currentSort = 'pool';
+  sortDir = 'desc';
+  
+  // Start observing after a delay to let data load
+  setTimeout(() => {
+    observeValues();
+    // Also do an initial read
+    for (const [elId, key] of Object.entries(mcapMap)) {
+      const el = document.getElementById(elId);
+      if (el) poolData[key].mcap = parseDisplayValue(el.textContent);
+    }
+    for (const [elId, key] of Object.entries(poolMap)) {
+      const el = document.getElementById(elId);
+      if (el) poolData[key].pool = parseDisplayValue(el.textContent);
+    }
+    doSort();
+    
+    // Update active header
+    const activeHeader = document.querySelector('[data-sort="pool"]');
+    if (activeHeader) activeHeader.classList.add('active');
+  }, 5000);
+});
 </script>
 <script>
 function copyCA() {
