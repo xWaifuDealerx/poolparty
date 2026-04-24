@@ -446,6 +446,10 @@ section {
 .marquee-item .tag { color: var(--accent-gold); font-weight: 700; }
 .marquee-item .green { color: var(--accent-green); }
 
+
+.marquee-change {
+  font-weight: 700;
+}
 .marquee-sep {
   color: var(--text-dim);
   font-size: 8px;
@@ -1114,16 +1118,46 @@ footer {
 <!-- MARQUEE -->
 <div class="marquee-wrap">
   <div class="marquee-track">
-    <div class="marquee-item"><span class="tag">$401K</span> /$POOL <span class="green">—</span></div>
-    <div class="marquee-item">Total Pools: 4</div>
-    <div class="marquee-item">TVL: $0</div>
-    <div class="marquee-item">24h Volume: $0</div>
-    <div class="marquee-item">Arbitrage Trades: 0</div>
-    <div class="marquee-item"><span class="tag">$401K</span> /$POOL <span class="green">—</span></div>
-    <div class="marquee-item">Total Pools: 4</div>
-    <div class="marquee-item">TVL: $0</div>
-    <div class="marquee-item">24h Volume: $0</div>
-    <div class="marquee-item">Arbitrage Trades: 0</div>
+    <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-0">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-0">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-0">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$BELIEF</span> <span class="mc" id="mc-BELIEF-0">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$发财</span> <span class="mc" id="mc-FACAI-0">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-1">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-1">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-1">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$BELIEF</span> <span class="mc" id="mc-BELIEF-1">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$发财</span> <span class="mc" id="mc-FACAI-1">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-2">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-2">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-2">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$BELIEF</span> <span class="mc" id="mc-BELIEF-2">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$发财</span> <span class="mc" id="mc-FACAI-2">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-3">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-3">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-3">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$BELIEF</span> <span class="mc" id="mc-BELIEF-3">—</span></div>
+    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$发财</span> <span class="mc" id="mc-FACAI-3">—</span></div>
+    <div class="marquee-sep">•</div>
   </div>
 </div>
 
@@ -1326,7 +1360,6 @@ footer {
   <div class="footer-links">
     <a href="https://app.printr.money" target="_blank">Printr</a>
     <a href="https://app.meteora.ag/" target="_blank">Meteora</a>
-    <a href="#">Docs</a>
     <a href="https://x.com/printrpoolparty" target="_blank">Twitter</a>
   </div>
 </footer>
@@ -1386,14 +1419,9 @@ async function fetchTokenPrice() {
       heroChangeEl.style.color = priceChange >= 0 ? '#00ff88' : '#ff4466';
     }
 
-// Also update 24h volume from this pair in marquee
-    const vol24h = pair.volume?.h24 || 0;
-    document.querySelectorAll('.marquee-vol').forEach(el => {
-      if (vol24h > 0) el.textContent = formatUSDSimple(vol24h);
-    });
+// marquee now shows price changes
 
   } catch (err) {
-    console.log('Could not fetch token price:', err);
   }
 }
 
@@ -1442,7 +1470,6 @@ async function fetchMeteoraData() {
       apy: parseFloat(pool.fee_apr || pool.apr || pool.apy || 0),
     };
   } catch (e) {
-    console.log('Meteora API fallback:', e.message);
     return null;
   }
 }
@@ -1462,7 +1489,6 @@ async function fetchDexScreenerData() {
       fees24: (pair.volume?.h24 || 0) * 0.003, // estimate 0.3% fee
     };
   } catch (e) {
-    console.log('DexScreener fallback:', e.message);
     return null;
   }
 }
@@ -1493,8 +1519,7 @@ async function fetchPoolData() {
   
 
   // Update marquee
-  document.querySelectorAll('.marquee-tvl').forEach(el => el.textContent = formatUSD(tvl));
-  document.querySelectorAll('.marquee-vol').forEach(el => el.textContent = formatUSD(vol24));
+  // marquee now shows price changes
 }
 
 fetchPoolData();
@@ -1502,39 +1527,112 @@ setInterval(fetchPoolData, 30000);
 </script>
 <script>
 const STAKING_ACCOUNT = '8AUMPAjfH6Zghw26oHDaip5ZbdYKKBVwBYVNS4yFepuz';
-const SOLANA_RPC = 'https://rpc.ankr.com/solana';
-const POOL_TOKEN_ADDR = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
 const POOL_PRICE_PAIR = 'BshPsiAgXjbAdpuBKG6AM5d6yB2TYyfxefQDCWTzsRDy';
+const POOL_MINT_STAKE = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
+const STAKING_RPCS = ['https://rpc.ankr.com/solana', 'https://solana-mainnet.g.alchemy.com/v2/demo'];
+
+async function stakingRpc(method, params) {
+  for (const rpc of STAKING_RPCS) {
+    try {
+      const res = await fetch(rpc, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method, params })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (!data.error) return data;
+      }
+    } catch(e) {
+    }
+  }
+  return null;
+}
+
+let stakingVaultAddr = null;
 
 async function fetchStakingData() {
   try {
-    const stakingRpcs = ['https://rpc.ankr.com/solana', 'https://solana-mainnet.g.alchemy.com/v2/demo'];
-    let balanceData = null;
-    for (const rpc of stakingRpcs) {
-      try {
-        const balanceRes = await fetch(rpc, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            jsonrpc: '2.0',
-            id: 1,
-            method: 'getTokenAccountBalance',
-            params: [STAKING_ACCOUNT]
-          })
-        });
-        if (balanceRes.ok) {
-          balanceData = await balanceRes.json();
-          if (!balanceData.error) break;
-        }
-      } catch(e) { console.log('Staking RPC failed:', rpc); }
-    }
-    if (!balanceData) return;
-    const tokenBalance = balanceData?.result?.value?.uiAmount || 0;
+    let tokenBalance = 0;
 
-    // Get price
+    // If we already found the vault, use it directly
+    if (stakingVaultAddr) {
+      const info = await stakingRpc('getAccountInfo', [stakingVaultAddr, { encoding: 'jsonParsed' }]);
+      tokenBalance = info?.result?.value?.data?.parsed?.info?.tokenAmount?.uiAmount || 0;
+    }
+
+    if (tokenBalance === 0) {
+      // Step 1: Check what kind of account this is
+      const acctInfo = await stakingRpc('getAccountInfo', [STAKING_ACCOUNT, { encoding: 'jsonParsed' }]);
+      if (!acctInfo?.result?.value) {
+        return;
+      }
+
+      const owner = acctInfo.result.value.owner;
+      const parsed = acctInfo.result.value.data?.parsed;
+
+      // Case A: It's a token account
+      if (parsed && parsed.type === 'account' && parsed.info && parsed.info.tokenAmount) {
+        tokenBalance = parsed.info.tokenAmount.uiAmount || 0;
+        stakingVaultAddr = STAKING_ACCOUNT;
+      }
+
+      // Case B: Token program owned
+      if (tokenBalance === 0 && (owner === 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' || owner === 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb')) {
+        const bal = await stakingRpc('getTokenAccountBalance', [STAKING_ACCOUNT]);
+        tokenBalance = bal?.result?.value?.uiAmount || 0;
+        if (tokenBalance > 0) stakingVaultAddr = STAKING_ACCOUNT;
+      }
+
+      // Case C: Program account - scan for POOL token vault (same as pool scanner)
+      if (tokenBalance === 0) {
+        const rawInfo = await stakingRpc('getAccountInfo', [STAKING_ACCOUNT, { encoding: 'base64' }]);
+        if (rawInfo?.result?.value?.data) {
+          const raw = atob(rawInfo.result.value.data[0]);
+          const bytes = new Uint8Array(raw.length);
+          for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+
+          const A = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+          function b58e(b) {
+            let num = 0n;
+            for (const x of b) num = num * 256n + BigInt(x);
+            let r = '';
+            while (num > 0n) { r = A[Number(num % 58n)] + r; num /= 58n; }
+            for (const x of b) { if (x === 0) r = '1' + r; else break; }
+            return r;
+          }
+
+          const checked = new Set();
+          for (let off = 8; off + 32 <= bytes.length; off++) {
+            const pk = b58e(bytes.slice(off, off + 32));
+            if (pk.length >= 32 && pk.length <= 44 && !checked.has(pk) && pk !== STAKING_ACCOUNT && pk !== POOL_MINT_STAKE) {
+              checked.add(pk);
+              try {
+                const info = await stakingRpc('getAccountInfo', [pk, { encoding: 'jsonParsed' }]);
+                const p = info?.result?.value?.data?.parsed;
+                if (p && p.type === 'account' && p.info && p.info.mint === POOL_MINT_STAKE) {
+                  tokenBalance = p.info.tokenAmount?.uiAmount || 0;
+                  if (tokenBalance > 0) {
+                    stakingVaultAddr = pk;
+                    break;
+                  }
+                }
+              } catch(e) {}
+              await new Promise(r => setTimeout(r, 100));
+            }
+          }
+        }
+      }
+    }
+
+    if (tokenBalance === 0) {
+      return;
+    }
+
+    // Get price from DexScreener
     let priceUsd = 0;
     try {
-      const priceRes = await fetch(`https://api.dexscreener.com/latest/dex/pairs/solana/${POOL_PRICE_PAIR}`);
+      const priceRes = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/' + POOL_PRICE_PAIR);
       const priceData = await priceRes.json();
       const pair = priceData.pairs ? priceData.pairs[0] : priceData.pair;
       if (pair) priceUsd = parseFloat(pair.priceUsd) || 0;
@@ -1545,7 +1643,7 @@ async function fetchStakingData() {
     function fmtTokens(n) {
       if (n >= 1000000000) return (n / 1000000000).toFixed(2) + 'B';
       if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
-      if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+      if (n >= 1000) return Math.floor(n).toLocaleString();
       return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
     }
     function fmtUsd(n) {
@@ -1557,18 +1655,17 @@ async function fetchStakingData() {
     }
 
     const amountEl = document.getElementById('stakedAmount');
-    if (amountEl) amountEl.textContent = fmtTokens(tokenBalance) + ' POOL';
+    if (amountEl) amountEl.textContent = fmtTokens(tokenBalance) + ' $POOL';
 
     const usdEl = document.getElementById('stakedUsd');
     if (usdEl && stakedUsd > 0) usdEl.textContent = '≈ ' + fmtUsd(stakedUsd);
 
   } catch (err) {
-    console.log('Could not fetch staking data:', err);
   }
 }
 
 fetchStakingData();
-setInterval(fetchStakingData, 30000);
+setInterval(fetchStakingData, 60000);
 </script>
 
 
@@ -1604,7 +1701,6 @@ setInterval(fetchStakingData, 30000);
           if (el) el.textContent = fmtMcap(mcap);
         }
       } catch(e) {
-        console.log('Mcap fetch failed for', p.el, e);
       }
     }
   }
@@ -1675,7 +1771,6 @@ setInterval(fetchStakingData, 30000);
       // Step 1: Determine account type
       const acctInfo = await rpcCall('getAccountInfo', [pool.addr, { encoding: 'jsonParsed' }]);
       if (!acctInfo || !acctInfo.result || !acctInfo.result.value) {
-        console.log('[' + pool.name + '] Account not found');
         return;
       }
 
@@ -1687,7 +1782,6 @@ setInterval(fetchStakingData, 30000);
           owner === 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb') {
         if (parsed && parsed.info && parsed.info.tokenAmount) {
           const amount = parsed.info.tokenAmount.uiAmount || 0;
-          console.log('[' + pool.name + '] Token account, balance: ' + amount);
           if (amount > 0) {
             el.textContent = fmtTokens(amount) + ' $POOL';
             return;
@@ -1697,7 +1791,6 @@ setInterval(fetchStakingData, 30000);
 
       // CASE 2: Meteora pool - extract vault addresses from binary data
       if (owner === METEORA_PROGRAM) {
-        console.log('[' + pool.name + '] Meteora pool detected. Extracting vaults...');
         
         const rawInfo = await rpcCall('getAccountInfo', [pool.addr, { encoding: 'base64' }]);
         if (!rawInfo?.result?.value?.data) return;
@@ -1706,8 +1799,6 @@ setInterval(fetchStakingData, 30000);
         const raw = atob(b64);
         const bytes = new Uint8Array(raw.length);
         for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
-        
-        console.log('[' + pool.name + '] Account data size: ' + bytes.length + ' bytes');
         
         // Extract all 32-byte pubkeys from the account data
         // DAMM v2 pool has pubkeys at fixed positions after the 8-byte discriminator
@@ -1735,8 +1826,6 @@ setInterval(fetchStakingData, 30000);
           }
         }
         
-        console.log('[' + pool.name + '] Extracted ' + pubkeys.length + ' unique pubkeys');
-        
         // Check each pubkey: is it a token account holding POOL tokens?
         for (const pk of pubkeys) {
           if (pk.addr === pool.addr || pk.addr === POOL_MINT) continue;
@@ -1748,7 +1837,6 @@ setInterval(fetchStakingData, 30000);
             if (p && p.type === 'account' && p.info) {
               if (p.info.mint === POOL_MINT) {
                 const amount = p.info.tokenAmount?.uiAmount || 0;
-                console.log('[' + pool.name + '] FOUND POOL vault at offset ' + pk.offset + ': ' + pk.addr + ' = ' + amount);
                 if (amount > 0) {
                   el.textContent = fmtTokens(amount) + ' $POOL';
                   // Cache this vault address for future lookups
@@ -1764,10 +1852,7 @@ setInterval(fetchStakingData, 30000);
         }
       }
 
-      console.log('[' + pool.name + '] Could not find POOL balance');
-
     } catch(e) {
-      console.log('[' + pool.name + '] Error:', e.message);
     }
   }
 
@@ -1930,6 +2015,46 @@ window.addEventListener('load', () => {
     if (activeHeader) activeHeader.classList.add('active');
   }, 5000);
 });
+</script>
+<script>
+(async function fetchPriceChanges() {
+  const coins = [
+    { key: 'POOL', pair: 'BshPsiAgXjbAdpuBKG6AM5d6yB2TYyfxefQDCWTzsRDy' },
+    { key: '401K', pair: '8nqkHMKKkBG63j8NTkj3SVxlQDKc3SVMo8g2fNe3UkhI' },
+    { key: 'UP', pair: '3JACEgdMskhKVWAJ3pHi19HTvUNBV5rMCochXof6weH6' },
+    { key: 'BELIEF', pair: 'HeHzRCzPiI9aZD1QzpLjSJWsNYGhVhPfbYPcMeP3gUGG' },
+    { key: 'FACAI', pair: 'DBC5hNAa9VATXyiyt5vg4PPfvxLxm17WbuCAbfJfP8wi' },
+  ];
+
+  async function update() {
+    for (const coin of coins) {
+      try {
+        const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/' + coin.pair);
+        const data = await res.json();
+        const pair = data.pairs ? data.pairs[0] : data.pair;
+        if (pair) {
+          const change = pair.priceChange?.h24 || 0;
+          const text = (change >= 0 ? '+' : '') + change.toFixed(1) + '%';
+          const color = change >= 0 ? '#00ff88' : '#ff4466';
+          
+          // Update all instances in the marquee
+          for (let i = 0; i < 4; i++) {
+            const el = document.getElementById('mc-' + coin.key + '-' + i);
+            if (el) {
+              el.textContent = text;
+              el.style.color = color;
+            }
+          }
+        }
+      } catch(e) {
+      }
+      await new Promise(r => setTimeout(r, 200));
+    }
+  }
+
+  await update();
+  setInterval(update, 30000);
+})();
 </script>
 <script>
 function copyCA() {
