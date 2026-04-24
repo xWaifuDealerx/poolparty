@@ -1068,7 +1068,7 @@ footer {
     <li><a href="#how">How It Works</a></li>
     <li><a href="#pools">Pools</a></li>
     <li><a href="#staking">Staking</a></li>
-    <li><a href="https://app.printr.money" target="_blank">Printr</a></li>
+    <li><a href="https://app.printr.money/trade/0x2c07e665041022b8b7247f82ce736eea6c48a4cf37370b0b6b327efad60af8f6" target="_blank">Printr</a></li>
   </ul>
 </nav>
 
@@ -1305,39 +1305,10 @@ footer {
       </div>
       <a href="https://app.printr.money/trade/0x2c07e665041022b8b7247f82ce736eea6c48a4cf37370b0b6b327efad60af8f6?type=stake" target="_blank" class="btn-stake">Stake on Printr</a>
     </div>
-    <div class="staking-stats">
-      <div class="s-stat">
-        <div class="s-stat-val">—</div>
-        <div class="s-stat-label">Tokens Staked</div>
-      </div>
-      <div class="s-stat">
-        <div class="s-stat-val">—</div>
-        <div class="s-stat-label">USD Value</div>
-      </div>
-      <div class="s-stat">
-        <div class="s-stat-val">—</div>
-        <div class="s-stat-label">Stakers</div>
-      </div>
-      <div class="s-stat">
-        <div class="s-stat-val">$0</div>
-        <div class="s-stat-label">Fees Distributed</div>
-      </div>
-    </div>
-    <div class="staking-flow">
-      <div class="flow-step">
-        <div class="flow-icon">🔄</div>
-        <span>Trades generate fees</span>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step">
-        <div class="flow-icon">🏦</div>
-        <span>Fees collected</span>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step">
-        <div class="flow-icon">💰</div>
-        <span>Distributed to stakers</span>
-      </div>
+    <div class="staking-amount-display">
+      <div class="staked-label">Total $POOL Staked</div>
+      <div class="staked-value" id="stakedAmount">—</div>
+      <div class="staked-usd" id="stakedUsd"></div>
     </div>
   </div>
 </section>
@@ -1358,7 +1329,7 @@ footer {
     <span>$POOL &mdash; Pool Party &copy; 2026</span>
   </div>
   <div class="footer-links">
-    <a href="https://app.printr.money" target="_blank">Printr</a>
+    <a href="https://app.printr.money/trade/0x2c07e665041022b8b7247f82ce736eea6c48a4cf37370b0b6b327efad60af8f6" target="_blank">Printr</a>
     <a href="https://app.meteora.ag/" target="_blank">Meteora</a>
     <a href="https://x.com/printrpoolparty" target="_blank">Twitter</a>
   </div>
@@ -1527,7 +1498,7 @@ setInterval(fetchPoolData, 30000);
 </script>
 <script>
 const STAKING_ACCOUNT = '8AUMPAjfH6Zghw26oHDaip5ZbdYKKBVwBYVNS4yFepuz';
-const POOL_PRICE_PAIR = 'BshPsiAgXjbAdpuBKG6AM5d6yB2TYyfxefQDCWTzsRDy';
+const POOL_PRICE_PAIR_S = 'BshPsiAgXjbAdpuBKG6AM5d6yB2TYyfxefQDCWTzsRDy';
 const POOL_MINT_STAKE = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
 const STAKING_RPCS = ['https://rpc.ankr.com/solana', 'https://solana-mainnet.g.alchemy.com/v2/demo'];
 
@@ -1543,8 +1514,7 @@ async function stakingRpc(method, params) {
         const data = await res.json();
         if (!data.error) return data;
       }
-    } catch(e) {
-    }
+    } catch(e) {}
   }
   return null;
 }
@@ -1555,84 +1525,81 @@ async function fetchStakingData() {
   try {
     let tokenBalance = 0;
 
-    // If we already found the vault, use it directly
+    // Use cached vault if we have one
     if (stakingVaultAddr) {
       const info = await stakingRpc('getAccountInfo', [stakingVaultAddr, { encoding: 'jsonParsed' }]);
-      tokenBalance = info?.result?.value?.data?.parsed?.info?.tokenAmount?.uiAmount || 0;
+      tokenBalance = info && info.result && info.result.value && info.result.value.data && info.result.value.data.parsed
+        ? (info.result.value.data.parsed.info.tokenAmount.uiAmount || 0) : 0;
     }
 
     if (tokenBalance === 0) {
-      // Step 1: Check what kind of account this is
-      const acctInfo = await stakingRpc('getAccountInfo', [STAKING_ACCOUNT, { encoding: 'jsonParsed' }]);
-      if (!acctInfo?.result?.value) {
-        return;
-      }
-
-      const owner = acctInfo.result.value.owner;
-      const parsed = acctInfo.result.value.data?.parsed;
-
-      // Case A: It's a token account
-      if (parsed && parsed.type === 'account' && parsed.info && parsed.info.tokenAmount) {
-        tokenBalance = parsed.info.tokenAmount.uiAmount || 0;
-        stakingVaultAddr = STAKING_ACCOUNT;
-      }
-
-      // Case B: Token program owned
-      if (tokenBalance === 0 && (owner === 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' || owner === 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb')) {
-        const bal = await stakingRpc('getTokenAccountBalance', [STAKING_ACCOUNT]);
-        tokenBalance = bal?.result?.value?.uiAmount || 0;
+      // Method 1: Direct getTokenAccountBalance
+      const bal = await stakingRpc('getTokenAccountBalance', [STAKING_ACCOUNT]);
+      if (bal && bal.result && bal.result.value && bal.result.value.uiAmount) {
+        tokenBalance = bal.result.value.uiAmount;
         if (tokenBalance > 0) stakingVaultAddr = STAKING_ACCOUNT;
       }
+    }
 
-      // Case C: Program account - scan for POOL token vault (same as pool scanner)
-      if (tokenBalance === 0) {
-        const rawInfo = await stakingRpc('getAccountInfo', [STAKING_ACCOUNT, { encoding: 'base64' }]);
-        if (rawInfo?.result?.value?.data) {
-          const raw = atob(rawInfo.result.value.data[0]);
-          const bytes = new Uint8Array(raw.length);
-          for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+    if (tokenBalance === 0) {
+      // Method 2: getAccountInfo jsonParsed (token account case)
+      const acctInfo = await stakingRpc('getAccountInfo', [STAKING_ACCOUNT, { encoding: 'jsonParsed' }]);
+      if (acctInfo && acctInfo.result && acctInfo.result.value) {
+        const parsed = acctInfo.result.value.data && acctInfo.result.value.data.parsed;
+        if (parsed && parsed.type === 'account' && parsed.info && parsed.info.tokenAmount) {
+          tokenBalance = parsed.info.tokenAmount.uiAmount || 0;
+          if (tokenBalance > 0) stakingVaultAddr = STAKING_ACCOUNT;
+        }
+      }
+    }
 
-          const A = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-          function b58e(b) {
-            let num = 0n;
-            for (const x of b) num = num * 256n + BigInt(x);
-            let r = '';
-            while (num > 0n) { r = A[Number(num % 58n)] + r; num /= 58n; }
-            for (const x of b) { if (x === 0) r = '1' + r; else break; }
-            return r;
-          }
+    // Method 3: Binary scan for POOL token vault inside program account data
+    if (tokenBalance === 0) {
+      const rawInfo = await stakingRpc('getAccountInfo', [STAKING_ACCOUNT, { encoding: 'base64' }]);
+      if (rawInfo && rawInfo.result && rawInfo.result.value && rawInfo.result.value.data) {
+        const raw = atob(rawInfo.result.value.data[0]);
+        const bytes = new Uint8Array(raw.length);
+        for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
 
-          const checked = new Set();
-          for (let off = 8; off + 32 <= bytes.length; off++) {
-            const pk = b58e(bytes.slice(off, off + 32));
-            if (pk.length >= 32 && pk.length <= 44 && !checked.has(pk) && pk !== STAKING_ACCOUNT && pk !== POOL_MINT_STAKE) {
-              checked.add(pk);
-              try {
-                const info = await stakingRpc('getAccountInfo', [pk, { encoding: 'jsonParsed' }]);
-                const p = info?.result?.value?.data?.parsed;
-                if (p && p.type === 'account' && p.info && p.info.mint === POOL_MINT_STAKE) {
-                  tokenBalance = p.info.tokenAmount?.uiAmount || 0;
-                  if (tokenBalance > 0) {
-                    stakingVaultAddr = pk;
-                    break;
-                  }
+        const A = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+        function b58e(b) {
+          let num = 0n;
+          for (const x of b) num = num * 256n + BigInt(x);
+          let r = '';
+          while (num > 0n) { r = A[Number(num % 58n)] + r; num /= 58n; }
+          for (const x of b) { if (x === 0) r = '1' + r; else break; }
+          return r;
+        }
+
+        const checked = new Set();
+        for (let off = 8; off + 32 <= bytes.length; off++) {
+          const pk = b58e(bytes.slice(off, off + 32));
+          if (pk.length >= 32 && pk.length <= 44 && !checked.has(pk) && pk !== STAKING_ACCOUNT && pk !== POOL_MINT_STAKE) {
+            checked.add(pk);
+            try {
+              const info = await stakingRpc('getAccountInfo', [pk, { encoding: 'jsonParsed' }]);
+              const p = info && info.result && info.result.value && info.result.value.data && info.result.value.data.parsed;
+              if (p && p.type === 'account' && p.info && p.info.mint === POOL_MINT_STAKE) {
+                const bal2 = (p.info.tokenAmount && p.info.tokenAmount.uiAmount) || 0;
+                if (bal2 > 0) {
+                  tokenBalance = bal2;
+                  stakingVaultAddr = pk;
+                  break;
                 }
-              } catch(e) {}
-              await new Promise(r => setTimeout(r, 100));
-            }
+              }
+            } catch(e) {}
+            await new Promise(r => setTimeout(r, 80));
           }
         }
       }
     }
 
-    if (tokenBalance === 0) {
-      return;
-    }
+    if (tokenBalance === 0) return;
 
     // Get price from DexScreener
     let priceUsd = 0;
     try {
-      const priceRes = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/' + POOL_PRICE_PAIR);
+      const priceRes = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/' + POOL_PRICE_PAIR_S);
       const priceData = await priceRes.json();
       const pair = priceData.pairs ? priceData.pairs[0] : priceData.pair;
       if (pair) priceUsd = parseFloat(pair.priceUsd) || 0;
@@ -1658,10 +1625,9 @@ async function fetchStakingData() {
     if (amountEl) amountEl.textContent = fmtTokens(tokenBalance) + ' $POOL';
 
     const usdEl = document.getElementById('stakedUsd');
-    if (usdEl && stakedUsd > 0) usdEl.textContent = '≈ ' + fmtUsd(stakedUsd);
+    if (usdEl && stakedUsd > 0) usdEl.textContent = '\u2248 ' + fmtUsd(stakedUsd);
 
-  } catch (err) {
-  }
+  } catch (err) {}
 }
 
 fetchStakingData();
@@ -1714,8 +1680,10 @@ setInterval(fetchStakingData, 60000);
 <script>
 (async function fetchAllPoolBalances() {
   const RPCS = [
+    'https://solana-rpc.publicnode.com',
     'https://rpc.ankr.com/solana',
     'https://solana-mainnet.g.alchemy.com/v2/demo',
+    'https://go.getblock.io/4136d34f90a6488b84214ae26f0ed5f4',
   ];
   let currentRpc = RPCS[0];
   const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
@@ -1765,17 +1733,20 @@ setInterval(fetchStakingData, 60000);
 
   async function fetchOne(pool) {
     const el = document.getElementById(pool.el);
-    if (!el) return;
+    if (!el) { console.log('[' + pool.name + '] Element not found:', pool.el); return; }
 
     try {
+      console.log('[' + pool.name + '] Fetching account info...');
       // Step 1: Determine account type
       const acctInfo = await rpcCall('getAccountInfo', [pool.addr, { encoding: 'jsonParsed' }]);
       if (!acctInfo || !acctInfo.result || !acctInfo.result.value) {
+        console.log('[' + pool.name + '] No account info returned');
         return;
       }
 
       const owner = acctInfo.result.value.owner;
       const parsed = acctInfo.result.value.data?.parsed;
+      console.log('[' + pool.name + '] Owner:', owner);
 
       // CASE 1: Token account - read directly
       if (owner === 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' || 
@@ -1838,6 +1809,7 @@ setInterval(fetchStakingData, 60000);
               if (p.info.mint === POOL_MINT) {
                 const amount = p.info.tokenAmount?.uiAmount || 0;
                 if (amount > 0) {
+                  console.log('[' + pool.name + '] FOUND POOL vault:', pk.addr, '=', amount);
                   el.textContent = fmtTokens(amount) + ' $POOL';
                   // Cache this vault address for future lookups
                   pool.vaultAddr = pk.addr;
