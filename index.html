@@ -1485,65 +1485,117 @@ setInterval(fetchStakingData, 30000);
 </script>
 
 <script>
-const LP_ADDRESS = '9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH';
-const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
-const RPC_URL = 'https://api.mainnet-beta.solana.com';
-
-async function fetchPooledAmount() {
-  // Try both token programs
-  const programs = [
-    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
-    'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
+(async function fetchPooledPOOL() {
+  const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
+  const LP_POOL = '9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH';
+  const RPCS = [
+    'https://api.mainnet-beta.solana.com',
+    'https://solana-mainnet.g.alchemy.com/v2/demo',
   ];
 
-  for (const programId of programs) {
-    try {
-      const res = await fetch(RPC_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'getTokenAccountsByOwner',
-          params: [
-            LP_ADDRESS,
-            { programId },
-            { encoding: 'jsonParsed' }
-          ]
-        })
-      });
-      const data = await res.json();
-      const accounts = data?.result?.value || [];
-
-      for (const acct of accounts) {
-        const info = acct.account?.data?.parsed?.info;
-        const mint = info?.mint || '';
-        const amount = info?.tokenAmount?.uiAmount || 0;
-        // Find the POOL token specifically
-        if (mint === POOL_MINT && amount > 0) {
-          updatePooledDisplay(amount);
-          return;
-        }
-      }
-    } catch(e) {
-      console.log('RPC fetch failed for program:', programId, e);
-    }
-  }
-}
-
-function updatePooledDisplay(amount) {
   function fmtTokens(n) {
     if (n >= 1000000000) return (n / 1000000000).toFixed(2) + 'B';
     if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
     if (n >= 1000) return Math.floor(n).toLocaleString();
     return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
   }
-  const el = document.getElementById('pooled401k');
-  if (el) el.textContent = fmtTokens(amount) + ' $POOL';
-}
 
-fetchPooledAmount();
-setInterval(fetchPooledAmount, 30000);
+  async function rpcCall(rpc, method, params) {
+    const res = await fetch(rpc, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params })
+    });
+    return await res.json();
+  }
+
+  async function tryFetch() {
+    for (const rpc of RPCS) {
+      try {
+        // Method 1: getTokenAccountsByOwner with mint filter
+        const data = await rpcCall(rpc, 'getTokenAccountsByOwner', [
+          LP_POOL,
+          { mint: POOL_MINT },
+          { encoding: 'jsonParsed' }
+        ]);
+        const accounts = data?.result?.value || [];
+        if (accounts.length > 0) {
+          const amount = accounts[0].account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0;
+          if (amount > 0) {
+            document.getElementById('pooled401k').textContent = fmtTokens(amount) + ' $POOL';
+            return true;
+          }
+        }
+
+        // Method 2: getTokenAccountsByOwner with program filter, find POOL mint
+        const data2 = await rpcCall(rpc, 'getTokenAccountsByOwner', [
+          LP_POOL,
+          { programId: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' },
+          { encoding: 'jsonParsed' }
+        ]);
+        const accounts2 = data2?.result?.value || [];
+        for (const acct of accounts2) {
+          const info = acct.account?.data?.parsed?.info;
+          if (info?.mint === POOL_MINT) {
+            const amount = info?.tokenAmount?.uiAmount || 0;
+            if (amount > 0) {
+              document.getElementById('pooled401k').textContent = fmtTokens(amount) + ' $POOL';
+              return true;
+            }
+          }
+        }
+
+        // Method 3: Also try Token-2022
+        const data3 = await rpcCall(rpc, 'getTokenAccountsByOwner', [
+          LP_POOL,
+          { programId: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb' },
+          { encoding: 'jsonParsed' }
+        ]);
+        const accounts3 = data3?.result?.value || [];
+        for (const acct of accounts3) {
+          const info = acct.account?.data?.parsed?.info;
+          if (info?.mint === POOL_MINT) {
+            const amount = info?.tokenAmount?.uiAmount || 0;
+            if (amount > 0) {
+              document.getElementById('pooled401k').textContent = fmtTokens(amount) + ' $POOL';
+              return true;
+            }
+          }
+        }
+
+      } catch(e) {
+        console.log('RPC failed:', rpc, e.message);
+      }
+    }
+
+    // Method 4: Fallback - use DexScreener pair liquidity data
+    try {
+      const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/' + LP_POOL);
+      const data = await res.json();
+      const pair = data.pairs ? data.pairs[0] : data.pair;
+      if (pair) {
+        // DexScreener shows reserves - find POOL side
+        const priceUsd = parseFloat(pair.priceUsd) || 0;
+        const liqUsd = pair.liquidity?.usd || 0;
+        if (priceUsd > 0 && liqUsd > 0) {
+          // Roughly half the liquidity is POOL tokens
+          const poolTokens = (liqUsd / 2) / priceUsd;
+          if (poolTokens > 0) {
+            document.getElementById('pooled401k').textContent = '~' + fmtTokens(poolTokens) + ' $POOL';
+            return true;
+          }
+        }
+      }
+    } catch(e) {
+      console.log('DexScreener fallback failed:', e);
+    }
+
+    return false;
+  }
+
+  await tryFetch();
+  setInterval(tryFetch, 30000);
+})();
 </script>
 
 
