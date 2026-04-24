@@ -1185,7 +1185,7 @@ footer {
         </td>
         <td class="pool-mcap" id="mcapUP">—</td>
         <td class="pool-tvl" id="pooledUP">—</td>
-        <td><a href="https://solscan.io/account/GMss5rmnmmo5XvuuHwrSU8HR4ATQYcSGHjBx8SMteXC9" target="_blank" class="pool-action-btn">View Pool</a></td>
+        <td><a href="https://solscan.io/account/7GQyJVGuWcCA2ax5pQruVqpJcm311oamLY28fZrw699s" target="_blank" class="pool-action-btn">View Pool</a></td>
       </tr>
     <tr class="pool-row">
         <td>
@@ -1541,7 +1541,8 @@ setInterval(fetchStakingData, 30000);
 <script>
 (async function fetchPooledPOOL() {
   const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
-  const LP_POOL = '9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH';
+  const ADDR = '9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH';
+  const RPC = 'https://api.mainnet-beta.solana.com';
 
   function fmtTokens(n) {
     if (n >= 1000000000) return (n / 1000000000).toFixed(2) + 'B';
@@ -1550,78 +1551,34 @@ setInterval(fetchStakingData, 30000);
     return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
   }
 
+  async function rpc(method, params) {
+    const res = await fetch(RPC, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params })
+    });
+    return await res.json();
+  }
+
   async function tryFetch() {
-    // Method 1: Meteora DAMM v2 data API
+    // Method A: Maybe ADDR is itself a token account
     try {
-      const res = await fetch('https://damm-v2.datapi.meteora.ag/pair/' + LP_POOL);
-      if (res.ok) {
-        const data = await res.json();
-        const pool = Array.isArray(data) ? data[0] : data;
-        if (pool) {
-          // Look for POOL token reserve amount
-          const mintA = pool.mint_a || pool.token_a_mint || '';
-          const mintB = pool.mint_b || pool.token_b_mint || '';
-          let poolAmount = 0;
-          if (mintA === POOL_MINT) {
-            poolAmount = parseFloat(pool.pool_token_amount_a || pool.token_a_amount || pool.reserve_a || 0);
-          } else if (mintB === POOL_MINT) {
-            poolAmount = parseFloat(pool.pool_token_amount_b || pool.token_b_amount || pool.reserve_b || 0);
-          }
-          // If we got raw amount, might need to divide by decimals
-          if (poolAmount > 1000000000000) poolAmount = poolAmount / 1e6; // adjust for 6 decimals
-          if (poolAmount > 0) {
-            document.getElementById('pooled401k').textContent = fmtTokens(poolAmount) + ' $POOL';
-            return true;
-          }
-          // Try any numeric fields that might have the data
-          const allKeys = Object.keys(pool);
-          console.log('Meteora pool data keys:', allKeys);
-          console.log('Meteora pool data:', JSON.stringify(pool).substring(0, 500));
+      const data = await rpc('getTokenAccountBalance', [ADDR]);
+      if (data?.result?.value) {
+        const amount = data.result.value.uiAmount || 0;
+        if (amount > 0) {
+          document.getElementById('pooled401k').textContent = fmtTokens(amount) + ' $POOL';
+          return true;
         }
       }
-    } catch(e) {
-      console.log('Meteora API failed:', e);
-    }
+    } catch(e) {}
 
-    // Method 2: Solana RPC - getTokenAccountsByOwner with mint filter
-    const rpcs = ['https://api.mainnet-beta.solana.com'];
-    for (const rpc of rpcs) {
+    // Method B: ADDR owns token accounts
+    for (const prog of ['TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA', 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb']) {
       try {
-        const res = await fetch(rpc, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            jsonrpc: '2.0', id: 1,
-            method: 'getTokenAccountsByOwner',
-            params: [LP_POOL, { mint: POOL_MINT }, { encoding: 'jsonParsed' }]
-          })
-        });
-        const data = await res.json();
-        console.log('RPC mint filter response:', JSON.stringify(data).substring(0, 300));
-        const accounts = data?.result?.value || [];
-        if (accounts.length > 0) {
-          const amount = accounts[0].account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0;
-          if (amount > 0) {
-            document.getElementById('pooled401k').textContent = fmtTokens(amount) + ' $POOL';
-            return true;
-          }
-        }
-
-        // Method 3: Try getting ALL accounts owned by the pool, any program
-        const res2 = await fetch(rpc, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            jsonrpc: '2.0', id: 2,
-            method: 'getTokenAccountsByOwner',
-            params: [LP_POOL, { programId: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' }, { encoding: 'jsonParsed' }]
-          })
-        });
-        const data2 = await res2.json();
-        console.log('RPC program filter accounts:', (data2?.result?.value || []).length);
-        for (const acct of (data2?.result?.value || [])) {
+        const data = await rpc('getTokenAccountsByOwner', [ADDR, { programId: prog }, { encoding: 'jsonParsed' }]);
+        for (const acct of (data?.result?.value || [])) {
           const info = acct.account?.data?.parsed?.info;
-          console.log('Found token:', info?.mint, 'amount:', info?.tokenAmount?.uiAmount);
           if (info?.mint === POOL_MINT) {
             const amount = info?.tokenAmount?.uiAmount || 0;
             if (amount > 0) {
@@ -1630,55 +1587,20 @@ setInterval(fetchStakingData, 30000);
             }
           }
         }
-
-        // Method 4: Token-2022
-        const res3 = await fetch(rpc, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            jsonrpc: '2.0', id: 3,
-            method: 'getTokenAccountsByOwner',
-            params: [LP_POOL, { programId: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb' }, { encoding: 'jsonParsed' }]
-          })
-        });
-        const data3 = await res3.json();
-        console.log('RPC Token2022 accounts:', (data3?.result?.value || []).length);
-        for (const acct of (data3?.result?.value || [])) {
-          const info = acct.account?.data?.parsed?.info;
-          console.log('Found Token2022:', info?.mint, 'amount:', info?.tokenAmount?.uiAmount);
-          if (info?.mint === POOL_MINT) {
-            const amount = info?.tokenAmount?.uiAmount || 0;
-            if (amount > 0) {
-              document.getElementById('pooled401k').textContent = fmtTokens(amount) + ' $POOL';
-              return true;
-            }
-          }
-        }
-
-      } catch(e) {
-        console.log('RPC failed:', rpc, e);
-      }
+      } catch(e) {}
     }
 
-    // Method 5: DexScreener estimate fallback
+    // Method C: Mint filter
     try {
-      const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/' + LP_POOL);
-      const data = await res.json();
-      const pair = data.pairs ? data.pairs[0] : data.pair;
-      if (pair) {
-        const priceUsd = parseFloat(pair.priceUsd) || 0;
-        const liqUsd = pair.liquidity?.usd || 0;
-        if (priceUsd > 0 && liqUsd > 0) {
-          const poolTokens = (liqUsd / 2) / priceUsd;
-          if (poolTokens > 0) {
-            document.getElementById('pooled401k').textContent = '~' + fmtTokens(poolTokens) + ' $POOL';
-            return true;
-          }
+      const data = await rpc('getTokenAccountsByOwner', [ADDR, { mint: POOL_MINT }, { encoding: 'jsonParsed' }]);
+      for (const acct of (data?.result?.value || [])) {
+        const amount = acct.account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0;
+        if (amount > 0) {
+          document.getElementById('pooled401k').textContent = fmtTokens(amount) + ' $POOL';
+          return true;
         }
       }
-    } catch(e) {
-      console.log('DexScreener fallback failed:', e);
-    }
+    } catch(e) {}
 
     return false;
   }
@@ -1692,11 +1614,8 @@ setInterval(fetchStakingData, 30000);
 <script>
 (async function fetchPooledUP() {
   const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
-  const UP_LP = 'GMss5rmnmmo5XvuuHwrSU8HR4ATQYcSGHjBx8SMteXC9';
-  const RPCS = [
-    'https://api.mainnet-beta.solana.com',
-    'https://solana-mainnet.g.alchemy.com/v2/demo',
-  ];
+  const ADDR = '7GQyJVGuWcCA2ax5pQruVqpJcm311oamLY28fZrw699s';
+  const RPC = 'https://api.mainnet-beta.solana.com';
 
   function fmtTokens(n) {
     if (n >= 1000000000) return (n / 1000000000).toFixed(2) + 'B';
@@ -1705,8 +1624,8 @@ setInterval(fetchStakingData, 30000);
     return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
   }
 
-  async function rpcCall(rpc, method, params) {
-    const res = await fetch(rpc, {
+  async function rpc(method, params) {
+    const res = await fetch(RPC, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params })
@@ -1715,51 +1634,34 @@ setInterval(fetchStakingData, 30000);
   }
 
   async function tryFetch() {
-    for (const rpc of RPCS) {
-      try {
-        // Try mint filter first
-        const data = await rpcCall(rpc, 'getTokenAccountsByOwner', [
-          UP_LP,
-          { mint: POOL_MINT },
-          { encoding: 'jsonParsed' }
-        ]);
-        const accounts = data?.result?.value || [];
-        if (accounts.length > 0) {
-          const amount = accounts[0].account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0;
-          if (amount > 0) {
-            document.getElementById('pooledUP').textContent = fmtTokens(amount) + ' $POOL';
-            return true;
-          }
+    try {
+      const data = await rpc('getTokenAccountBalance', [ADDR]);
+      if (data?.result?.value) {
+        const amount = data.result.value.uiAmount || 0;
+        if (amount > 0) {
+          document.getElementById('pooledUP').textContent = fmtTokens(amount) + ' $POOL';
+          return true;
         }
-
-        // Try program filter
-        for (const prog of ['TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA', 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb']) {
-          const data2 = await rpcCall(rpc, 'getTokenAccountsByOwner', [
-            UP_LP,
-            { programId: prog },
-            { encoding: 'jsonParsed' }
-          ]);
-          const accounts2 = data2?.result?.value || [];
-          for (const acct of accounts2) {
-            const info = acct.account?.data?.parsed?.info;
-            if (info?.mint === POOL_MINT) {
-              const amount = info?.tokenAmount?.uiAmount || 0;
-              if (amount > 0) {
-                document.getElementById('pooledUP').textContent = fmtTokens(amount) + ' $POOL';
-                return true;
-              }
-            }
-          }
-        }
-      } catch(e) {
-        console.log('UP pool RPC failed:', rpc, e.message);
       }
+    } catch(e) {}
+
+    for (const prog of ['TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA', 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb']) {
+      try {
+        const data = await rpc('getTokenAccountsByOwner', [ADDR, { programId: prog }, { encoding: 'jsonParsed' }]);
+        for (const acct of (data?.result?.value || [])) {
+          const info = acct.account?.data?.parsed?.info;
+          if (info?.mint === POOL_MINT) {
+            const amount = info?.tokenAmount?.uiAmount || 0;
+            if (amount > 0) { document.getElementById('pooledUP').textContent = fmtTokens(amount) + ' $POOL'; return true; }
+          }
+        }
+      } catch(e) {}
     }
     return false;
   }
 
   await tryFetch();
-  setInterval(tryFetch, 30000);
+  setInterval(tryFetch, 60000);
 })();
 </script>
 <script>
@@ -1803,8 +1705,8 @@ setInterval(fetchStakingData, 30000);
 <script>
 (async function fetchPooledBELIEF() {
   const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
-  const BELIEF_LP = 'CDGDzTGTtgHDLUv3rmshxRnceLCzA2Ni6qG9dUYRqyZM';
-  const RPCS = ['https://api.mainnet-beta.solana.com'];
+  const ADDR = 'CDGDzTGTtgHDLUv3rmshxRnceLCzA2Ni6qG9dUYRqyZM';
+  const RPC = 'https://api.mainnet-beta.solana.com';
 
   function fmtTokens(n) {
     if (n >= 1000000000) return (n / 1000000000).toFixed(2) + 'B';
@@ -1813,74 +1715,39 @@ setInterval(fetchStakingData, 30000);
     return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
   }
 
+  async function rpc(method, params) {
+    const res = await fetch(RPC, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params })
+    });
+    return await res.json();
+  }
+
   async function tryFetch() {
-    // Try Meteora datapi first
     try {
-      const res = await fetch('https://damm-v2.datapi.meteora.ag/pair/' + BELIEF_LP);
-      if (res.ok) {
-        const data = await res.json();
-        const pool = Array.isArray(data) ? data[0] : data;
-        if (pool) {
-          const mintA = pool.mint_a || pool.token_a_mint || '';
-          const mintB = pool.mint_b || pool.token_b_mint || '';
-          let poolAmount = 0;
-          if (mintA === POOL_MINT) poolAmount = parseFloat(pool.pool_token_amount_a || pool.token_a_amount || pool.reserve_a || 0);
-          else if (mintB === POOL_MINT) poolAmount = parseFloat(pool.pool_token_amount_b || pool.token_b_amount || pool.reserve_b || 0);
-          if (poolAmount > 1000000000000) poolAmount = poolAmount / 1e6;
-          if (poolAmount > 0) {
-            document.getElementById('pooledBELIEF').textContent = fmtTokens(poolAmount) + ' $POOL';
-            return true;
-          }
+      const data = await rpc('getTokenAccountBalance', [ADDR]);
+      if (data?.result?.value) {
+        const amount = data.result.value.uiAmount || 0;
+        if (amount > 0) {
+          document.getElementById('pooledBELIEF').textContent = fmtTokens(amount) + ' $POOL';
+          return true;
         }
       }
     } catch(e) {}
 
-    // RPC methods
-    for (const rpc of RPCS) {
-      for (const prog of ['TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA', 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb']) {
-        try {
-          const res = await fetch(rpc, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              jsonrpc: '2.0', id: 1,
-              method: 'getTokenAccountsByOwner',
-              params: [BELIEF_LP, { programId: prog }, { encoding: 'jsonParsed' }]
-            })
-          });
-          const data = await res.json();
-          for (const acct of (data?.result?.value || [])) {
-            const info = acct.account?.data?.parsed?.info;
-            if (info?.mint === POOL_MINT) {
-              const amount = info?.tokenAmount?.uiAmount || 0;
-              if (amount > 0) {
-                document.getElementById('pooledBELIEF').textContent = fmtTokens(amount) + ' $POOL';
-                return true;
-              }
-            }
+    for (const prog of ['TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA', 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb']) {
+      try {
+        const data = await rpc('getTokenAccountsByOwner', [ADDR, { programId: prog }, { encoding: 'jsonParsed' }]);
+        for (const acct of (data?.result?.value || [])) {
+          const info = acct.account?.data?.parsed?.info;
+          if (info?.mint === POOL_MINT) {
+            const amount = info?.tokenAmount?.uiAmount || 0;
+            if (amount > 0) { document.getElementById('pooledBELIEF').textContent = fmtTokens(amount) + ' $POOL'; return true; }
           }
-        } catch(e) {}
-      }
+        }
+      } catch(e) {}
     }
-
-    // DexScreener estimate fallback
-    try {
-      const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/' + BELIEF_LP);
-      const data = await res.json();
-      const pair = data.pairs ? data.pairs[0] : data.pair;
-      if (pair) {
-        const priceUsd = parseFloat(pair.priceUsd) || 0;
-        const liqUsd = pair.liquidity?.usd || 0;
-        if (priceUsd > 0 && liqUsd > 0) {
-          const poolTokens = (liqUsd / 2) / priceUsd;
-          if (poolTokens > 0) {
-            document.getElementById('pooledBELIEF').textContent = '~' + fmtTokens(poolTokens) + ' $POOL';
-            return true;
-          }
-        }
-      }
-    } catch(e) {}
-
     return false;
   }
 
@@ -1891,7 +1758,8 @@ setInterval(fetchStakingData, 30000);
 <script>
 (async function fetchPooledFACAI() {
   const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
-  const FACAI_LP = 'AJf4cwe5mdppPn6RtHRdsdVZvuALakJ9tswmFVuf8cxV';
+  const ADDR = 'AJf4cwe5mdppPn6RtHRdsdVZvuALakJ9tswmFVuf8cxV';
+  const RPC = 'https://api.mainnet-beta.solana.com';
 
   function fmtTokens(n) {
     if (n >= 1000000000) return (n / 1000000000).toFixed(2) + 'B';
@@ -1900,31 +1768,30 @@ setInterval(fetchStakingData, 30000);
     return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
   }
 
+  async function rpc(method, params) {
+    const res = await fetch(RPC, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params })
+    });
+    return await res.json();
+  }
+
   async function tryFetch() {
     try {
-      const res = await fetch('https://damm-v2.datapi.meteora.ag/pair/' + FACAI_LP);
-      if (res.ok) {
-        const data = await res.json();
-        const pool = Array.isArray(data) ? data[0] : data;
-        if (pool) {
-          const mintA = pool.mint_a || pool.token_a_mint || '';
-          const mintB = pool.mint_b || pool.token_b_mint || '';
-          let poolAmount = 0;
-          if (mintA === POOL_MINT) poolAmount = parseFloat(pool.pool_token_amount_a || pool.token_a_amount || pool.reserve_a || 0);
-          else if (mintB === POOL_MINT) poolAmount = parseFloat(pool.pool_token_amount_b || pool.token_b_amount || pool.reserve_b || 0);
-          if (poolAmount > 1000000000000) poolAmount = poolAmount / 1e6;
-          if (poolAmount > 0) { document.getElementById('pooledFACAI').textContent = fmtTokens(poolAmount) + ' $POOL'; return true; }
+      const data = await rpc('getTokenAccountBalance', [ADDR]);
+      if (data?.result?.value) {
+        const amount = data.result.value.uiAmount || 0;
+        if (amount > 0) {
+          document.getElementById('pooledFACAI').textContent = fmtTokens(amount) + ' $POOL';
+          return true;
         }
       }
     } catch(e) {}
 
     for (const prog of ['TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA', 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb']) {
       try {
-        const res = await fetch('https://api.mainnet-beta.solana.com', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getTokenAccountsByOwner', params: [FACAI_LP, { programId: prog }, { encoding: 'jsonParsed' }] })
-        });
-        const data = await res.json();
+        const data = await rpc('getTokenAccountsByOwner', [ADDR, { programId: prog }, { encoding: 'jsonParsed' }]);
         for (const acct of (data?.result?.value || [])) {
           const info = acct.account?.data?.parsed?.info;
           if (info?.mint === POOL_MINT) {
@@ -1934,20 +1801,6 @@ setInterval(fetchStakingData, 30000);
         }
       } catch(e) {}
     }
-
-    try {
-      const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/' + FACAI_LP);
-      const data = await res.json();
-      const pair = data.pairs ? data.pairs[0] : data.pair;
-      if (pair) {
-        const priceUsd = parseFloat(pair.priceUsd) || 0;
-        const liqUsd = pair.liquidity?.usd || 0;
-        if (priceUsd > 0 && liqUsd > 0) {
-          const poolTokens = (liqUsd / 2) / priceUsd;
-          if (poolTokens > 0) { document.getElementById('pooledFACAI').textContent = '~' + fmtTokens(poolTokens) + ' $POOL'; return true; }
-        }
-      }
-    } catch(e) {}
     return false;
   }
 
