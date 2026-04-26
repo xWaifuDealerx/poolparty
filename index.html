@@ -888,6 +888,50 @@ footer {
   flex-shrink: 0;
 }
 
+/* ── Pool Stats Box (above contract address) ── */
+.pool-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  max-width: 560px;
+  margin-bottom: 20px;
+  animation: fadeInUp 1s ease-out 0.65s both;
+}
+.pool-stat {
+  padding: 18px 20px;
+  background: rgba(13, 13, 31, 0.8);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+.pool-stat:hover {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 229, 255, 0.03);
+}
+.pool-stat-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.pool-stat-value {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 24px;
+  background: var(--gradient-pool);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+@media (max-width: 480px) {
+  .pool-stats { grid-template-columns: 1fr; }
+  .pool-stat-value { font-size: 22px; }
+}
 
 .staking-amount-display {
   text-align: center;
@@ -1153,6 +1197,16 @@ footer {
     </div>
     <h1>Pool <span class="gradient">Party</span></h1>
   <p class="hero-sub">Pool together. Print together. $POOL pairs with other tokens on Meteora to amplify visibility, deepen liquidity, and earn trading fees from arbitrage volume.</p>
+  <div class="pool-stats">
+    <div class="pool-stat">
+      <div class="pool-stat-label">Total $POOL Staked</div>
+      <div class="pool-stat-value" id="totalStakedStat">—</div>
+    </div>
+    <div class="pool-stat">
+      <div class="pool-stat-label">Total $POOL Pooled</div>
+      <div class="pool-stat-value" id="totalPooledStat">—</div>
+    </div>
+  </div>
   <div class="contract-address">
       <span class="ca-label">Contract Address</span>
       <div class="ca-box" onclick="copyCA()" id="caBox">
@@ -1164,7 +1218,7 @@ footer {
       </div>
     </div>
     <div class="hero-actions">
-    <a href="https://app.meteora.ag/" target="_blank" class="btn-primary">Add Liquidity</a>
+    <a href="#pools" class="btn-primary">Add Liquidity</a>
     <a href="#pools" class="btn-secondary">View Pools</a>
   </div>
 </section>
@@ -2158,6 +2212,74 @@ function copyCA() {
     }, 2000);
   });
 }
+</script>
+<script>
+// Aggregate totals: Total $POOL Staked + Total $POOL Pooled (sum across all 6 directory rows)
+(function aggregateTotals() {
+  const pooledIds = ['pooled401k', 'pooledUP', 'pooledBELIEF', 'pooledFACAI', 'pooledMIP', 'pooledFLYWHEEL'];
+  const stakedId = 'stakedAmount';
+  const totalStakedEl = document.getElementById('totalStakedStat');
+  const totalPooledEl = document.getElementById('totalPooledStat');
+
+  // Parse text like "1.23M $POOL", "123,456 $POOL", "12.34B" -> raw number
+  function parseTokenText(text) {
+    if (!text) return 0;
+    text = text.trim().replace(/\$POOL/gi, '').replace(/,/g, '').trim();
+    if (!text || text === '—') return 0;
+    const m = text.match(/^([0-9]*\.?[0-9]+)\s*([KMBkmb]?)/);
+    if (!m) return 0;
+    const num = parseFloat(m[1]);
+    if (isNaN(num)) return 0;
+    const suffix = (m[2] || '').toUpperCase();
+    const mult = suffix === 'B' ? 1e9 : suffix === 'M' ? 1e6 : suffix === 'K' ? 1e3 : 1;
+    return num * mult;
+  }
+
+  function fmtTokens(n) {
+    if (!n || n <= 0) return '—';
+    if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B $POOL';
+    if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M $POOL';
+    if (n >= 1e3) return Math.floor(n).toLocaleString() + ' $POOL';
+    return Math.floor(n).toLocaleString() + ' $POOL';
+  }
+
+  function recompute() {
+    // Total pooled = sum of all 6 directory entries
+    let totalPooled = 0;
+    let pooledCount = 0;
+    for (const id of pooledIds) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      const v = parseTokenText(el.textContent);
+      if (v > 0) {
+        totalPooled += v;
+        pooledCount++;
+      }
+    }
+    if (totalPooledEl && pooledCount > 0) {
+      totalPooledEl.textContent = fmtTokens(totalPooled);
+    }
+
+    // Total staked = stakedAmount element value
+    const stakedEl = document.getElementById(stakedId);
+    if (stakedEl && totalStakedEl) {
+      const v = parseTokenText(stakedEl.textContent);
+      if (v > 0) totalStakedEl.textContent = fmtTokens(v);
+    }
+  }
+
+  // Watch all source elements for changes
+  const observer = new MutationObserver(recompute);
+  const watchIds = [...pooledIds, stakedId];
+  for (const id of watchIds) {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el, { childList: true, characterData: true, subtree: true });
+  }
+
+  // Initial pass + periodic safety net
+  recompute();
+  setInterval(recompute, 5000);
+})();
 </script>
 </body>
 </html>
