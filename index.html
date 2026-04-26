@@ -595,6 +595,60 @@ section {
   background: rgba(0, 229, 255, 0.1);
   box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
 }
+.solscan-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  min-width: 42px;
+  border-color: rgba(0, 232, 181, 0.5);
+}
+.solscan-btn:hover {
+  background: rgba(0, 232, 181, 0.1);
+  border-color: rgba(0, 232, 181, 0.8);
+  box-shadow: 0 0 20px rgba(0, 232, 181, 0.2);
+}
+.solscan-icon {
+  display: block;
+  flex-shrink: 0;
+}
+.pool-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+.zap-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 165, 0, 0.1));
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  border-radius: 8px;
+  color: #ffd700;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Space Mono', monospace;
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+  outline: none;
+  line-height: 1;
+}
+.zap-btn:focus { outline: none; }
+.zap-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(255, 165, 0, 0.18));
+  border-color: rgba(255, 215, 0, 0.8);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.25);
+  transform: translateY(-1px);
+}
+.zap-btn .zap-icon {
+  font-size: 14px;
+  line-height: 1;
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
+}
 
 /* ── Tokenomics ── */
 .tokenomics-grid {
@@ -1119,52 +1173,40 @@ footer {
 <div class="marquee-wrap">
   <div class="marquee-track">
     <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-0">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-0">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-0">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$BELIEF</span> <span class="mc" id="mc-BELIEF-0">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$发财</span> <span class="mc" id="mc-FACAI-0">—</span></div>
-    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$MIP</span> <span class="mc" id="mc-MIP-0">—</span></div>
+    <div class="marquee-item"><span class="tag">$FLYWHEEL</span> <span class="mc" id="mc-FLYWHEEL-0">—</span></div>
     <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-1">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-1">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-1">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$BELIEF</span> <span class="mc" id="mc-BELIEF-1">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$发财</span> <span class="mc" id="mc-FACAI-1">—</span></div>
-    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$MIP</span> <span class="mc" id="mc-MIP-1">—</span></div>
+    <div class="marquee-item"><span class="tag">$FLYWHEEL</span> <span class="mc" id="mc-FLYWHEEL-1">—</span></div>
     <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-2">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-2">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-2">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$BELIEF</span> <span class="mc" id="mc-BELIEF-2">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$发财</span> <span class="mc" id="mc-FACAI-2">—</span></div>
-    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$MIP</span> <span class="mc" id="mc-MIP-2">—</span></div>
+    <div class="marquee-item"><span class="tag">$FLYWHEEL</span> <span class="mc" id="mc-FLYWHEEL-2">—</span></div>
     <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-3">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-3">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-3">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$BELIEF</span> <span class="mc" id="mc-BELIEF-3">—</span></div>
-    <div class="marquee-sep">•</div>
     <div class="marquee-item"><span class="tag">$发财</span> <span class="mc" id="mc-FACAI-3">—</span></div>
-    <div class="marquee-sep">•</div>
+    <div class="marquee-item"><span class="tag">$MIP</span> <span class="mc" id="mc-MIP-3">—</span></div>
+    <div class="marquee-item"><span class="tag">$FLYWHEEL</span> <span class="mc" id="mc-FLYWHEEL-3">—</span></div>
   </div>
 </div>
 
 <!-- STATS -->
 <div class="stats-bar">
   <div class="stat-item">
-    <div class="stat-value">4</div>
+    <div class="stat-value">6</div>
     <div class="stat-label">Active Pools</div>
   </div>
   
@@ -1227,7 +1269,12 @@ footer {
         </td>
         <td class="pool-mcap" id="mcap401k">—</td>
         <td class="pool-tvl" id="pooled401k">—</td>
-        <td><a href="https://solscan.io/account/9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH" target="_blank" class="pool-action-btn">View Pool</a></td>
+        <td>
+          <div class="pool-actions">
+            <a href="https://app.meteora.ag/dammv2/9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
+            <a href="https://solscan.io/account/9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
+          </div>
+        </td>
       </tr>
     <tr class="pool-row">
         <td>
@@ -1242,7 +1289,12 @@ footer {
         </td>
         <td class="pool-mcap" id="mcapUP">—</td>
         <td class="pool-tvl" id="pooledUP">—</td>
-        <td><a href="https://solscan.io/account/7GQyJVGuWcCA2ax5pQruVqpJcm311oamLY28fZrw699s" target="_blank" class="pool-action-btn">View Pool</a></td>
+        <td>
+          <div class="pool-actions">
+            <a href="https://app.meteora.ag/dammv2/7GQyJVGuWcCA2ax5pQruVqpJcm311oamLY28fZrw699s" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
+            <a href="https://solscan.io/account/7GQyJVGuWcCA2ax5pQruVqpJcm311oamLY28fZrw699s" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
+          </div>
+        </td>
       </tr>
     <tr class="pool-row">
         <td>
@@ -1257,7 +1309,12 @@ footer {
         </td>
         <td class="pool-mcap" id="mcapBELIEF">—</td>
         <td class="pool-tvl" id="pooledBELIEF">—</td>
-        <td><a href="https://solscan.io/account/CDGDzTGTtgHDLUv3rmshxRnceLCzA2Ni6qG9dUYRqyZM" target="_blank" class="pool-action-btn">View Pool</a></td>
+        <td>
+          <div class="pool-actions">
+            <a href="https://app.meteora.ag/dammv2/CDGDzTGTtgHDLUv3rmshxRnceLCzA2Ni6qG9dUYRqyZM" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
+            <a href="https://solscan.io/account/CDGDzTGTtgHDLUv3rmshxRnceLCzA2Ni6qG9dUYRqyZM" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
+          </div>
+        </td>
       </tr>
     <tr class="pool-row">
         <td>
@@ -1272,7 +1329,52 @@ footer {
         </td>
         <td class="pool-mcap" id="mcapFACAI">—</td>
         <td class="pool-tvl" id="pooledFACAI">—</td>
-        <td><a href="https://solscan.io/account/AJf4cwe5mdppPn6RtHRdsdVZvuALakJ9tswmFVuf8cxV" target="_blank" class="pool-action-btn">View Pool</a></td>
+        <td>
+          <div class="pool-actions">
+            <a href="https://app.meteora.ag/dammv2/AJf4cwe5mdppPn6RtHRdsdVZvuALakJ9tswmFVuf8cxV" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
+            <a href="https://solscan.io/account/AJf4cwe5mdppPn6RtHRdsdVZvuALakJ9tswmFVuf8cxV" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
+          </div>
+        </td>
+      </tr>
+      <tr class="pool-row">
+        <td>
+          <div class="pool-pair">
+            <div class="pool-pair-icons">
+              <div class="icon"><img src="data:image/jpeg;base64,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" alt="MIP"></div>
+            </div>
+            <div class="pool-pair-info">
+              <div class="pair-name">$MIP</div>
+            </div>
+          </div>
+        </td>
+        <td class="pool-mcap" id="mcapMIP">—</td>
+        <td class="pool-tvl" id="pooledMIP">—</td>
+        <td>
+          <div class="pool-actions">
+            <a href="https://app.meteora.ag/dammv2/4ZKvvKsDACN5wXYDA3PcrfPJtwrpi8dFDe2616QEGD4C" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
+            <a href="https://solscan.io/account/4ZKvvKsDACN5wXYDA3PcrfPJtwrpi8dFDe2616QEGD4C" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
+          </div>
+        </td>
+      </tr>
+      <tr class="pool-row">
+        <td>
+          <div class="pool-pair">
+            <div class="pool-pair-icons">
+              <div class="icon"><img src="data:image/jpeg;base64,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" alt="FLYWHEEL"></div>
+            </div>
+            <div class="pool-pair-info">
+              <div class="pair-name">$FLYWHEEL</div>
+            </div>
+          </div>
+        </td>
+        <td class="pool-mcap" id="mcapFLYWHEEL">—</td>
+        <td class="pool-tvl" id="pooledFLYWHEEL">—</td>
+        <td>
+          <div class="pool-actions">
+            <a href="https://app.meteora.ag/dammv2/2aaZnrxuWKELou3ritGBiLYVUG7pz5iFtychRmuNAeJD" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
+            <a href="https://solscan.io/account/2aaZnrxuWKELou3ritGBiLYVUG7pz5iFtychRmuNAeJD" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
+          </div>
+        </td>
       </tr>
     </tbody>
   </table>
@@ -1650,6 +1752,8 @@ setInterval(fetchStakingData, 60000);
     { id: '3JACEgdMskhKVWAJ3pHi19HTvUNBV5rMCochXof6weH6', el: 'mcapUP' },
     { id: 'HeHzRCzPiI9aZD1QzpLjSJWsNYGhVhPfbYPcMeP3gUGG', el: 'mcapBELIEF' },
     { id: 'DBC5hNAa9VATXyiyt5vg4PPfvxLxm17WbuCAbfJfP8wi', el: 'mcapFACAI' },
+    { id: 'gfpvrgybp5ntug449t76duhmvqr3fsub1eptkbhhxxls', el: 'mcapMIP' },
+    { id: 'fc2rywpndprb4ik2v31tktdo4eewtzahqjcwcljauvfd', el: 'mcapFLYWHEEL' },
   ];
 
   function fmtMcap(n) {
@@ -1699,12 +1803,14 @@ setInterval(fetchStakingData, 60000);
     { addr: '7GQyJVGuWcCA2ax5pQruVqpJcm311oamLY28fZrw699s', el: 'pooledUP', name: 'UP' },
     { addr: 'CDGDzTGTtgHDLUv3rmshxRnceLCzA2Ni6qG9dUYRqyZM', el: 'pooledBELIEF', name: 'BELIEF' },
     { addr: 'AJf4cwe5mdppPn6RtHRdsdVZvuALakJ9tswmFVuf8cxV', el: 'pooledFACAI', name: 'FACAI' },
+    { addr: '4ZKvvKsDACN5wXYDA3PcrfPJtwrpi8dFDe2616QEGD4C', el: 'pooledMIP', name: 'MIP' },
+    { addr: '2aaZnrxuWKELou3ritGBiLYVUG7pz5iFtychRmuNAeJD', el: 'pooledFLYWHEEL', name: 'FLYWHEEL' },
   ];
 
   function fmtTokens(n) {
     if (n >= 1000000000) return (n / 1000000000).toFixed(2) + 'B';
     if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
-    if (n >= 1000) return Math.floor(n).toLocaleString();
+    if (n >= 1000) return (n / 1000).toFixed(2) + 'K';
     return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
   }
 
@@ -1871,11 +1977,13 @@ const poolData = {
   'UP': { mcap: 0, pool: 0 },
   'BELIEF': { mcap: 0, pool: 0 },
   'FACAI': { mcap: 0, pool: 0 },
+  'MIP': { mcap: 0, pool: 0 },
+  'FLYWHEEL': { mcap: 0, pool: 0 },
 };
 
 // Map element IDs to pool keys
-const mcapMap = { 'mcap401k': '401k', 'mcapUP': 'UP', 'mcapBELIEF': 'BELIEF', 'mcapFACAI': 'FACAI' };
-const poolMap = { 'pooled401k': '401k', 'pooledUP': 'UP', 'pooledBELIEF': 'BELIEF', 'pooledFACAI': 'FACAI' };
+const mcapMap = { 'mcap401k': '401k', 'mcapUP': 'UP', 'mcapBELIEF': 'BELIEF', 'mcapFACAI': 'FACAI', 'mcapMIP': 'MIP', 'mcapFLYWHEEL': 'FLYWHEEL' };
+const poolMap = { 'pooled401k': '401k', 'pooledUP': 'UP', 'pooledBELIEF': 'BELIEF', 'pooledFACAI': 'FACAI', 'pooledMIP': 'MIP', 'pooledFLYWHEEL': 'FLYWHEEL' };
 
 // Observe changes to mcap and pool elements to capture raw values
 function observeValues() {
@@ -1950,6 +2058,8 @@ function doSort() {
     '$UP': 'UP',
     '$BELIEF': 'BELIEF',
     '$发财': 'FACAI',
+    '$MIP': 'MIP',
+    '$FLYWHEEL': 'FLYWHEEL',
   };
   
   rows.sort((a, b) => {
@@ -2001,6 +2111,8 @@ window.addEventListener('load', () => {
     { key: 'UP', pair: '3JACEgdMskhKVWAJ3pHi19HTvUNBV5rMCochXof6weH6' },
     { key: 'BELIEF', pair: 'HeHzRCzPiI9aZD1QzpLjSJWsNYGhVhPfbYPcMeP3gUGG' },
     { key: 'FACAI', pair: 'DBC5hNAa9VATXyiyt5vg4PPfvxLxm17WbuCAbfJfP8wi' },
+    { key: 'MIP', pair: 'gfpvrgybp5ntug449t76duhmvqr3fsub1eptkbhhxxls' },
+    { key: 'FLYWHEEL', pair: 'fc2rywpndprb4ik2v31tktdo4eewtzahqjcwcljauvfd' },
   ];
 
   async function update() {
