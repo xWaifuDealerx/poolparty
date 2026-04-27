@@ -612,6 +612,44 @@ section {
   display: block;
   flex-shrink: 0;
 }
+
+.copy-ca-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  min-width: 42px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+  outline: none;
+  line-height: 1;
+}
+.copy-ca-btn:hover:not(:disabled) {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  background: rgba(0, 229, 255, 0.06);
+  box-shadow: 0 0 16px rgba(0, 229, 255, 0.15);
+}
+.copy-ca-btn:disabled {
+  opacity: 0.4;
+  cursor: wait;
+}
+.copy-ca-btn.copied {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  background: rgba(0, 255, 136, 0.06);
+}
+.copy-ca-btn svg {
+  display: block;
+  flex-shrink: 0;
+}
 .pool-actions {
   display: flex;
   gap: 8px;
@@ -1233,6 +1271,8 @@ footer {
     <div class="marquee-item"><span class="tag">$发财</span> <span class="mc" id="mc-FACAI-0">—</span></div>
     <div class="marquee-item"><span class="tag">$MIP</span> <span class="mc" id="mc-MIP-0">—</span></div>
     <div class="marquee-item"><span class="tag">$FLYWHEEL</span> <span class="mc" id="mc-FLYWHEEL-0">—</span></div>
+    <div class="marquee-item"><span class="tag">$PIC</span> <span class="mc" id="mc-PIC-0">—</span></div>
+    <div class="marquee-item"><span class="tag">$POSTR</span> <span class="mc" id="mc-POSTR-0">—</span></div>
     <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-1">—</span></div>
     <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-1">—</span></div>
     <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-1">—</span></div>
@@ -1240,6 +1280,8 @@ footer {
     <div class="marquee-item"><span class="tag">$发财</span> <span class="mc" id="mc-FACAI-1">—</span></div>
     <div class="marquee-item"><span class="tag">$MIP</span> <span class="mc" id="mc-MIP-1">—</span></div>
     <div class="marquee-item"><span class="tag">$FLYWHEEL</span> <span class="mc" id="mc-FLYWHEEL-1">—</span></div>
+    <div class="marquee-item"><span class="tag">$PIC</span> <span class="mc" id="mc-PIC-1">—</span></div>
+    <div class="marquee-item"><span class="tag">$POSTR</span> <span class="mc" id="mc-POSTR-1">—</span></div>
     <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-2">—</span></div>
     <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-2">—</span></div>
     <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-2">—</span></div>
@@ -1247,6 +1289,8 @@ footer {
     <div class="marquee-item"><span class="tag">$发财</span> <span class="mc" id="mc-FACAI-2">—</span></div>
     <div class="marquee-item"><span class="tag">$MIP</span> <span class="mc" id="mc-MIP-2">—</span></div>
     <div class="marquee-item"><span class="tag">$FLYWHEEL</span> <span class="mc" id="mc-FLYWHEEL-2">—</span></div>
+    <div class="marquee-item"><span class="tag">$PIC</span> <span class="mc" id="mc-PIC-2">—</span></div>
+    <div class="marquee-item"><span class="tag">$POSTR</span> <span class="mc" id="mc-POSTR-2">—</span></div>
     <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-3">—</span></div>
     <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-3">—</span></div>
     <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-3">—</span></div>
@@ -1254,13 +1298,15 @@ footer {
     <div class="marquee-item"><span class="tag">$发财</span> <span class="mc" id="mc-FACAI-3">—</span></div>
     <div class="marquee-item"><span class="tag">$MIP</span> <span class="mc" id="mc-MIP-3">—</span></div>
     <div class="marquee-item"><span class="tag">$FLYWHEEL</span> <span class="mc" id="mc-FLYWHEEL-3">—</span></div>
+    <div class="marquee-item"><span class="tag">$PIC</span> <span class="mc" id="mc-PIC-3">—</span></div>
+    <div class="marquee-item"><span class="tag">$POSTR</span> <span class="mc" id="mc-POSTR-3">—</span></div>
   </div>
 </div>
 
 <!-- STATS -->
 <div class="stats-bar">
   <div class="stat-item">
-    <div class="stat-value">6</div>
+    <div class="stat-value" id="activePoolsStat">—</div>
     <div class="stat-label">Active Pools</div>
   </div>
   
@@ -1325,6 +1371,7 @@ footer {
         <td class="pool-tvl" id="pooled401k">—</td>
         <td>
           <div class="pool-actions">
+            <button type="button" class="copy-ca-btn" data-token="401K" title="Copy 401K contract address" disabled onclick="copyTokenCA(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
             <a href="https://app.meteora.ag/dammv2/9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
             <a href="https://solscan.io/account/9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
           </div>
@@ -1345,6 +1392,7 @@ footer {
         <td class="pool-tvl" id="pooledUP">—</td>
         <td>
           <div class="pool-actions">
+            <button type="button" class="copy-ca-btn" data-token="UP" title="Copy UP contract address" disabled onclick="copyTokenCA(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
             <a href="https://app.meteora.ag/dammv2/7GQyJVGuWcCA2ax5pQruVqpJcm311oamLY28fZrw699s" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
             <a href="https://solscan.io/account/7GQyJVGuWcCA2ax5pQruVqpJcm311oamLY28fZrw699s" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
           </div>
@@ -1365,6 +1413,7 @@ footer {
         <td class="pool-tvl" id="pooledBELIEF">—</td>
         <td>
           <div class="pool-actions">
+            <button type="button" class="copy-ca-btn" data-token="BELIEF" title="Copy BELIEF contract address" disabled onclick="copyTokenCA(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
             <a href="https://app.meteora.ag/dammv2/CDGDzTGTtgHDLUv3rmshxRnceLCzA2Ni6qG9dUYRqyZM" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
             <a href="https://solscan.io/account/CDGDzTGTtgHDLUv3rmshxRnceLCzA2Ni6qG9dUYRqyZM" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
           </div>
@@ -1385,6 +1434,7 @@ footer {
         <td class="pool-tvl" id="pooledFACAI">—</td>
         <td>
           <div class="pool-actions">
+            <button type="button" class="copy-ca-btn" data-token="FACAI" title="Copy FACAI contract address" disabled onclick="copyTokenCA(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
             <a href="https://app.meteora.ag/dammv2/AJf4cwe5mdppPn6RtHRdsdVZvuALakJ9tswmFVuf8cxV" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
             <a href="https://solscan.io/account/AJf4cwe5mdppPn6RtHRdsdVZvuALakJ9tswmFVuf8cxV" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
           </div>
@@ -1405,6 +1455,7 @@ footer {
         <td class="pool-tvl" id="pooledMIP">—</td>
         <td>
           <div class="pool-actions">
+            <button type="button" class="copy-ca-btn" data-token="MIP" title="Copy MIP contract address" disabled onclick="copyTokenCA(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
             <a href="https://app.meteora.ag/dammv2/4ZKvvKsDACN5wXYDA3PcrfPJtwrpi8dFDe2616QEGD4C" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
             <a href="https://solscan.io/account/4ZKvvKsDACN5wXYDA3PcrfPJtwrpi8dFDe2616QEGD4C" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
           </div>
@@ -1425,8 +1476,51 @@ footer {
         <td class="pool-tvl" id="pooledFLYWHEEL">—</td>
         <td>
           <div class="pool-actions">
+            <button type="button" class="copy-ca-btn" data-token="FLYWHEEL" title="Copy FLYWHEEL contract address" disabled onclick="copyTokenCA(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
             <a href="https://app.meteora.ag/dammv2/2aaZnrxuWKELou3ritGBiLYVUG7pz5iFtychRmuNAeJD" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
             <a href="https://solscan.io/account/2aaZnrxuWKELou3ritGBiLYVUG7pz5iFtychRmuNAeJD" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
+          </div>
+        </td>
+      </tr>
+      <tr class="pool-row">
+        <td>
+          <div class="pool-pair">
+            <div class="pool-pair-icons">
+              <div class="icon"><img src="data:image/jpeg;base64,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" alt="PIC"></div>
+            </div>
+            <div class="pool-pair-info">
+              <div class="pair-name">$PIC</div>
+            </div>
+          </div>
+        </td>
+        <td class="pool-mcap" id="mcapPIC">—</td>
+        <td class="pool-tvl" id="pooledPIC">—</td>
+        <td>
+          <div class="pool-actions">
+            <button type="button" class="copy-ca-btn" data-token="PIC" title="Copy PIC contract address" disabled onclick="copyTokenCA(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+            <a href="https://dexscreener.com/solana/fj2y1cpojwjqxqvzmrtd5jyj6llssvaj4ef28qcgrqmi" target="_blank" class="zap-btn" title="View pair on DexScreener"><span class="zap-icon">⚡</span>0.1</a>
+            <a href="https://solscan.io/account/8MwjSfymMK5F5uraWFZUDTtyJKCdwiEWrMt2PWq4Mk5m" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
+          </div>
+        </td>
+      </tr>
+      <tr class="pool-row">
+        <td>
+          <div class="pool-pair">
+            <div class="pool-pair-icons">
+              <div class="icon"><img src="data:image/jpeg;base64,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" alt="POSTR"></div>
+            </div>
+            <div class="pool-pair-info">
+              <div class="pair-name">$POSTR</div>
+            </div>
+          </div>
+        </td>
+        <td class="pool-mcap" id="mcapPOSTR">—</td>
+        <td class="pool-tvl" id="pooledPOSTR">—</td>
+        <td>
+          <div class="pool-actions">
+            <button type="button" class="copy-ca-btn" data-token="POSTR" title="Copy POSTR contract address" disabled onclick="copyTokenCA(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+            <a href="https://dexscreener.com/solana/9edsj9f2mjhpuwdxusbaawanjkc9ao6fwhmeeefudkpr" target="_blank" class="zap-btn" title="View pair on DexScreener"><span class="zap-icon">⚡</span>0.1</a>
+            <a href="https://solscan.io/account/DozDYdQnDSW3tYmo8KGcYnjqhwbNcqEof5Xq4sejaj8D" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
           </div>
         </td>
       </tr>
@@ -1771,7 +1865,7 @@ async function fetchStakingData() {
     function fmtTokens(n) {
       if (n >= 1000000000) return (n / 1000000000).toFixed(2) + 'B';
       if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
-      if (n >= 1000) return Math.floor(n).toLocaleString();
+      if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
       return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
     }
     function fmtUsd(n) {
@@ -1808,6 +1902,8 @@ setInterval(fetchStakingData, 60000);
     { id: 'DBC5hNAa9VATXyiyt5vg4PPfvxLxm17WbuCAbfJfP8wi', el: 'mcapFACAI' },
     { id: 'gfpvrgybp5ntug449t76duhmvqr3fsub1eptkbhhxxls', el: 'mcapMIP' },
     { id: 'fc2rywpndprb4ik2v31tktdo4eewtzahqjcwcljauvfd', el: 'mcapFLYWHEEL' },
+    { id: 'fj2y1cpojwjqxqvzmrtd5jyj6llssvaj4ef28qcgrqmi', el: 'mcapPIC' },
+    { id: '9edsj9f2mjhpuwdxusbaawanjkc9ao6fwhmeeefudkpr', el: 'mcapPOSTR' },
   ];
 
   function fmtMcap(n) {
@@ -1859,12 +1955,14 @@ setInterval(fetchStakingData, 60000);
     { addr: 'AJf4cwe5mdppPn6RtHRdsdVZvuALakJ9tswmFVuf8cxV', el: 'pooledFACAI', name: 'FACAI' },
     { addr: '4ZKvvKsDACN5wXYDA3PcrfPJtwrpi8dFDe2616QEGD4C', el: 'pooledMIP', name: 'MIP' },
     { addr: '2aaZnrxuWKELou3ritGBiLYVUG7pz5iFtychRmuNAeJD', el: 'pooledFLYWHEEL', name: 'FLYWHEEL' },
+    { addr: '8MwjSfymMK5F5uraWFZUDTtyJKCdwiEWrMt2PWq4Mk5m', el: 'pooledPIC', name: 'PIC', vaultAddr: '8MwjSfymMK5F5uraWFZUDTtyJKCdwiEWrMt2PWq4Mk5m' },
+    { addr: 'DozDYdQnDSW3tYmo8KGcYnjqhwbNcqEof5Xq4sejaj8D', el: 'pooledPOSTR', name: 'POSTR', vaultAddr: 'DozDYdQnDSW3tYmo8KGcYnjqhwbNcqEof5Xq4sejaj8D' },
   ];
 
   function fmtTokens(n) {
     if (n >= 1000000000) return (n / 1000000000).toFixed(2) + 'B';
     if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
-    if (n >= 1000) return (n / 1000).toFixed(2) + 'K';
+    if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
     return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
   }
 
@@ -2033,11 +2131,13 @@ const poolData = {
   'FACAI': { mcap: 0, pool: 0 },
   'MIP': { mcap: 0, pool: 0 },
   'FLYWHEEL': { mcap: 0, pool: 0 },
+  'PIC': { mcap: 0, pool: 0 },
+  'POSTR': { mcap: 0, pool: 0 },
 };
 
 // Map element IDs to pool keys
-const mcapMap = { 'mcap401k': '401k', 'mcapUP': 'UP', 'mcapBELIEF': 'BELIEF', 'mcapFACAI': 'FACAI', 'mcapMIP': 'MIP', 'mcapFLYWHEEL': 'FLYWHEEL' };
-const poolMap = { 'pooled401k': '401k', 'pooledUP': 'UP', 'pooledBELIEF': 'BELIEF', 'pooledFACAI': 'FACAI', 'pooledMIP': 'MIP', 'pooledFLYWHEEL': 'FLYWHEEL' };
+const mcapMap = { 'mcap401k': '401k', 'mcapUP': 'UP', 'mcapBELIEF': 'BELIEF', 'mcapFACAI': 'FACAI', 'mcapMIP': 'MIP', 'mcapFLYWHEEL': 'FLYWHEEL', 'mcapPIC': 'PIC', 'mcapPOSTR': 'POSTR' };
+const poolMap = { 'pooled401k': '401k', 'pooledUP': 'UP', 'pooledBELIEF': 'BELIEF', 'pooledFACAI': 'FACAI', 'pooledMIP': 'MIP', 'pooledFLYWHEEL': 'FLYWHEEL', 'pooledPIC': 'PIC', 'pooledPOSTR': 'POSTR' };
 
 // Observe changes to mcap and pool elements to capture raw values
 function observeValues() {
@@ -2114,6 +2214,8 @@ function doSort() {
     '$发财': 'FACAI',
     '$MIP': 'MIP',
     '$FLYWHEEL': 'FLYWHEEL',
+    '$PIC': 'PIC',
+    '$POSTR': 'POSTR',
   };
   
   rows.sort((a, b) => {
@@ -2159,6 +2261,7 @@ window.addEventListener('load', () => {
 </script>
 <script>
 (async function fetchPriceChanges() {
+  const POOL_MINT = 'BYVmWXkubwRxnZfdM389RtJJajDMh1LULZjXvfonbrrr';
   const coins = [
     { key: 'POOL', pair: 'BshPsiAgXjbAdpuBKG6AM5d6yB2TYyfxefQDCWTzsRDy' },
     { key: '401K', pair: '8nqkHMKKkBG63j8NTkj3SVxlQDKc3SVMo8g2fNe3UkhI' },
@@ -2167,7 +2270,20 @@ window.addEventListener('load', () => {
     { key: 'FACAI', pair: 'DBC5hNAa9VATXyiyt5vg4PPfvxLxm17WbuCAbfJfP8wi' },
     { key: 'MIP', pair: 'gfpvrgybp5ntug449t76duhmvqr3fsub1eptkbhhxxls' },
     { key: 'FLYWHEEL', pair: 'fc2rywpndprb4ik2v31tktdo4eewtzahqjcwcljauvfd' },
+    { key: 'PIC', pair: 'fj2y1cpojwjqxqvzmrtd5jyj6llssvaj4ef28qcgrqmi' },
+    { key: 'POSTR', pair: '9edsj9f2mjhpuwdxusbaawanjkc9ao6fwhmeeefudkpr' },
   ];
+
+  // Cache resolved mint addresses so we don't repeat work
+  const mintCache = {};
+
+  function applyMintToButtons(key, mint) {
+    if (!mint) return;
+    document.querySelectorAll('.copy-ca-btn[data-token="' + key + '"]').forEach(btn => {
+      btn.dataset.mint = mint;
+      btn.disabled = false;
+    });
+  }
 
   async function update() {
     for (const coin of coins) {
@@ -2186,6 +2302,19 @@ window.addEventListener('load', () => {
             if (el) {
               el.textContent = text;
               el.style.color = color;
+            }
+          }
+
+          // Resolve and cache the token mint address (the side that isn't $POOL)
+          if (!mintCache[coin.key] && coin.key !== 'POOL') {
+            const baseAddr = pair.baseToken?.address;
+            const quoteAddr = pair.quoteToken?.address;
+            let mint = null;
+            if (baseAddr && baseAddr !== POOL_MINT) mint = baseAddr;
+            else if (quoteAddr && quoteAddr !== POOL_MINT) mint = quoteAddr;
+            if (mint) {
+              mintCache[coin.key] = mint;
+              applyMintToButtons(coin.key, mint);
             }
           }
         }
@@ -2212,14 +2341,29 @@ function copyCA() {
     }, 2000);
   });
 }
+
+function copyTokenCA(btn) {
+  const mint = btn.dataset.mint;
+  if (!mint) return;
+  navigator.clipboard.writeText(mint).then(() => {
+    const original = btn.innerHTML;
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = original;
+    }, 1600);
+  }).catch(() => {});
+}
 </script>
 <script>
 // Aggregate totals: Total $POOL Staked + Total $POOL Pooled (sum across all 6 directory rows)
 (function aggregateTotals() {
-  const pooledIds = ['pooled401k', 'pooledUP', 'pooledBELIEF', 'pooledFACAI', 'pooledMIP', 'pooledFLYWHEEL'];
+  const pooledIds = ['pooled401k', 'pooledUP', 'pooledBELIEF', 'pooledFACAI', 'pooledMIP', 'pooledFLYWHEEL', 'pooledPIC', 'pooledPOSTR'];
   const stakedId = 'stakedAmount';
   const totalStakedEl = document.getElementById('totalStakedStat');
   const totalPooledEl = document.getElementById('totalPooledStat');
+  const activePoolsEl = document.getElementById('activePoolsStat');
 
   // Parse text like "1.23M $POOL", "123,456 $POOL", "12.34B" -> raw number
   function parseTokenText(text) {
@@ -2239,12 +2383,12 @@ function copyCA() {
     if (!n || n <= 0) return '—';
     if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B $POOL';
     if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M $POOL';
-    if (n >= 1e3) return Math.floor(n).toLocaleString() + ' $POOL';
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K $POOL';
     return Math.floor(n).toLocaleString() + ' $POOL';
   }
 
   function recompute() {
-    // Total pooled = sum of all 6 directory entries
+    // Total pooled = sum of all directory entries with a positive balance
     let totalPooled = 0;
     let pooledCount = 0;
     for (const id of pooledIds) {
@@ -2258,6 +2402,11 @@ function copyCA() {
     }
     if (totalPooledEl && pooledCount > 0) {
       totalPooledEl.textContent = fmtTokens(totalPooled);
+    }
+
+    // Active Pools = directory entries with a non-zero $POOL balance
+    if (activePoolsEl && pooledCount > 0) {
+      activePoolsEl.textContent = pooledCount;
     }
 
     // Total staked = stakedAmount element value
