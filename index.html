@@ -580,10 +580,89 @@ section {
   width: 100%;
   height: 560px;
   border-radius: 24px;
-  background: radial-gradient(ellipse at center, rgba(0, 229, 255, 0.04) 0%, rgba(13, 13, 31, 0.4) 70%);
-  border: 1px solid var(--border);
+  /* Layered "pool water" background:
+     1. Deep gradient — looking down into water (light at top, dark at bottom)
+     2. A radial highlight to suggest a sunbeam falling onto the surface
+     3. Base color falls back to a deep teal */
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 20%, rgba(120, 220, 255, 0.18) 0%, transparent 60%),
+    linear-gradient(to bottom,
+      rgba(0, 200, 230, 0.18) 0%,
+      rgba(0, 120, 180, 0.22) 40%,
+      rgba(0, 60, 120, 0.28) 100%),
+    #08182a;
+  border: 1px solid rgba(80, 200, 255, 0.18);
   overflow: hidden;
   touch-action: none;
+  /* Inner shadow gives the impression of a sunken pool */
+  box-shadow:
+    inset 0 12px 40px rgba(0, 0, 0, 0.55),
+    inset 0 -8px 30px rgba(0, 0, 0, 0.35),
+    0 0 60px rgba(0, 180, 255, 0.06);
+}
+/* Animated caustics overlay — refracted light shimmer on the pool floor.
+   Two layered SVG patterns drift in opposite directions for that "rippling
+   reflection" feel. */
+.bubble-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(ellipse 200px 80px at 20% 30%, rgba(180, 240, 255, 0.10), transparent 70%),
+    radial-gradient(ellipse 240px 100px at 70% 50%, rgba(180, 240, 255, 0.08), transparent 70%),
+    radial-gradient(ellipse 160px 60px at 40% 75%, rgba(180, 240, 255, 0.10), transparent 70%),
+    radial-gradient(ellipse 220px 90px at 85% 20%, rgba(180, 240, 255, 0.07), transparent 70%),
+    radial-gradient(ellipse 180px 70px at 10% 80%, rgba(180, 240, 255, 0.09), transparent 70%);
+  background-size: 100% 100%;
+  mix-blend-mode: screen;
+  animation: poolCaustics 14s ease-in-out infinite alternate;
+  z-index: 0;
+}
+/* Water surface gloss — a thin highlight at the very top, like the meniscus. */
+.bubble-stage::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  pointer-events: none;
+  background: linear-gradient(to bottom,
+    rgba(255, 255, 255, 0.10) 0%,
+    rgba(180, 240, 255, 0.04) 40%,
+    transparent 100%);
+  z-index: 0;
+}
+@keyframes poolCaustics {
+  0%   { transform: translate( 0,  0) scale(1.0);   opacity: 0.85; }
+  50%  { transform: translate(20px, -10px) scale(1.05); opacity: 1.0; }
+  100% { transform: translate(-15px, 8px) scale(0.98);  opacity: 0.85; }
+}
+/* Tiny ambient bubbles rising in the water column. Pure decoration —
+   non-interactive, doesn't affect physics. */
+.pool-ambient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+.pool-ambient .ab {
+  position: absolute;
+  bottom: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.7), rgba(180,240,255,0.15) 60%, transparent 80%);
+  box-shadow: inset 0 0 6px rgba(255,255,255,0.4);
+  animation: ambientRise linear infinite;
+  opacity: 0;
+}
+@keyframes ambientRise {
+  0%   { transform: translateY(0)      translateX(0); opacity: 0; }
+  10%  { opacity: 0.6; }
+  50%  { transform: translateY(-280px) translateX(8px);  opacity: 0.4; }
+  90%  { opacity: 0.2; }
+  100% { transform: translateY(-580px) translateX(-6px); opacity: 0; }
 }
 .bubble-hint {
   position: absolute;
@@ -592,17 +671,23 @@ section {
   transform: translateX(-50%);
   font-family: 'Space Mono', monospace;
   font-size: 11px;
-  color: var(--text-dim);
+  color: rgba(220, 245, 255, 0.85);
   letter-spacing: 1.5px;
   text-transform: uppercase;
   pointer-events: none;
-  z-index: 1;
-  opacity: 0.7;
+  z-index: 2;
+  opacity: 0.85;
+  text-shadow: 0 1px 4px rgba(0, 30, 60, 0.6);
 }
 .bubble-hint span {
-  color: var(--accent-cyan);
+  color: #aef0ff;
   margin-right: 6px;
 }
+/* Each bubble is a glassy water droplet:
+   - Translucent cyan fill, blurred backdrop
+   - Top-left specular highlight (::before)
+   - Bottom inner reflection ring (::after)
+   - Soft cyan halo around the whole thing */
 .bubble {
   position: absolute;
   border-radius: 50%;
@@ -614,29 +699,70 @@ section {
   user-select: none;
   -webkit-user-select: none;
   text-align: center;
-  background: rgba(13, 13, 31, 0.85);
-  backdrop-filter: blur(8px);
-  border: 2px solid transparent;
-  background-clip: padding-box;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,0.18) 0%, transparent 35%),
+    radial-gradient(circle at 70% 80%, rgba(0, 80, 140, 0.35) 0%, transparent 50%),
+    linear-gradient(160deg, rgba(80, 200, 255, 0.28), rgba(0, 100, 160, 0.45));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1.5px solid rgba(180, 240, 255, 0.55);
+  box-shadow:
+    inset 0 8px 18px rgba(255, 255, 255, 0.18),
+    inset 0 -10px 20px rgba(0, 30, 60, 0.45),
+    0 0 24px rgba(0, 200, 255, 0.18),
+    0 6px 18px rgba(0, 30, 80, 0.4);
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.05s linear;
   will-change: transform;
   overflow: hidden;
+  z-index: 1;
 }
+/* Specular highlight — the bright "shine" spot on a water bead's top-left */
 .bubble::before {
   content: '';
   position: absolute;
-  inset: -2px;
+  top: 8%;
+  left: 14%;
+  width: 32%;
+  height: 22%;
   border-radius: 50%;
-  background: var(--gradient-pool);
-  z-index: -1;
-  opacity: 0.45;
-  filter: blur(4px);
+  background: radial-gradient(ellipse at center,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(255, 255, 255, 0.25) 45%,
+    transparent 75%);
+  filter: blur(1px);
+  pointer-events: none;
+  z-index: 3;
 }
-.bubble:hover, .bubble.dragging {
-  border-color: rgba(0, 229, 255, 0.5);
-  box-shadow: 0 0 32px rgba(0, 229, 255, 0.25);
+/* Inner rim glow on the lower half — gives that "tension" surface curve */
+.bubble::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 110%,
+    rgba(180, 240, 255, 0.35) 0%,
+    transparent 35%);
+  z-index: 2;
 }
-.bubble.dragging { cursor: grabbing; z-index: 10; }
+.bubble:hover {
+  border-color: rgba(220, 250, 255, 0.85);
+  box-shadow:
+    inset 0 8px 18px rgba(255, 255, 255, 0.25),
+    inset 0 -10px 20px rgba(0, 30, 60, 0.45),
+    0 0 36px rgba(0, 220, 255, 0.40),
+    0 6px 18px rgba(0, 30, 80, 0.4);
+}
+.bubble.dragging {
+  cursor: grabbing;
+  z-index: 10;
+  border-color: rgba(220, 250, 255, 0.95);
+  box-shadow:
+    inset 0 8px 18px rgba(255, 255, 255, 0.30),
+    inset 0 -10px 20px rgba(0, 30, 60, 0.40),
+    0 0 48px rgba(0, 220, 255, 0.55),
+    0 8px 24px rgba(0, 30, 80, 0.5);
+}
 .bubble-icon {
   width: 38%;
   height: 38%;
@@ -644,24 +770,34 @@ section {
   object-fit: cover;
   margin-bottom: 4px;
   pointer-events: none;
+  position: relative;
+  z-index: 4;
+  /* A very faint white ring so the icon reads as floating inside water */
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.25), 0 2px 6px rgba(0, 20, 40, 0.5);
 }
 .bubble-ticker {
   font-family: 'Syne', sans-serif;
   font-weight: 800;
-  color: var(--text-primary);
+  color: #ffffff;
   letter-spacing: -0.5px;
   pointer-events: none;
   line-height: 1;
   white-space: nowrap;
+  position: relative;
+  z-index: 4;
+  text-shadow: 0 1px 3px rgba(0, 30, 60, 0.7), 0 0 8px rgba(0, 80, 160, 0.5);
 }
 .bubble-value {
   font-family: 'Space Mono', monospace;
-  color: var(--accent-cyan);
+  color: #aef0ff;
   font-weight: 700;
   margin-top: 2px;
   pointer-events: none;
   line-height: 1;
   white-space: nowrap;
+  position: relative;
+  z-index: 4;
+  text-shadow: 0 1px 2px rgba(0, 30, 60, 0.7);
 }
 @media (max-width: 768px) {
   .bubble-stage { height: 460px; }
@@ -942,7 +1078,29 @@ footer {
 @media (max-width: 768px) {
   .hero-price-row { gap: 16px; padding: 10px 16px; }
   .hp-val { font-size: 13px; }
-  .nav-price { display: none; }
+  /* Hide the in-nav price box on mobile so the header has breathing room */
+  nav .nav-price { display: none !important; }
+  /* Give the contract address room to fit on a single line on mobile */
+  .ca-box { padding: 8px 10px; gap: 6px; max-width: calc(100vw - 24px); }
+  .ca-text {
+    font-size: 10px;
+    word-break: normal;
+    overflow-wrap: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    letter-spacing: -0.2px;
+  }
+  .ca-copy { font-size: 10px; }
+  .ca-copy svg { width: 12px; height: 12px; }
+  /* Tighten the nav slightly on mobile */
+  nav { padding: 14px 20px; }
+}
+@media (max-width: 380px) {
+  .ca-text { font-size: 9px; letter-spacing: -0.3px; }
+  .ca-box { padding: 8px; gap: 4px; }
+  .ca-copy { font-size: 9px; }
 }
 
 
@@ -1649,11 +1807,21 @@ footer {
 <section id="bubbles" class="bubble-section">
   <div class="section-header">
     <div class="section-tag">Visual Comparison</div>
-    <h2 class="section-title">Pool Bubble Map</h2>
-    <p class="section-desc">Each bubble's size represents its $POOL liquidity. Drag them around to compare.</p>
+    <h2 class="section-title">The Liquidity Pool</h2>
+    <p class="section-desc">Each bubble's size represents its $POOL liquidity. Drag them around to compare — bigger pools, bigger bubbles.</p>
   </div>
 
   <div class="bubble-stage" id="bubbleStage">
+    <div class="pool-ambient" aria-hidden="true">
+      <span class="ab" style="left: 8%;  width: 10px; height: 10px; animation-duration: 9s;  animation-delay: 0s;"></span>
+      <span class="ab" style="left: 22%; width: 6px;  height: 6px;  animation-duration: 7s;  animation-delay: 2s;"></span>
+      <span class="ab" style="left: 35%; width: 12px; height: 12px; animation-duration: 11s; animation-delay: 4s;"></span>
+      <span class="ab" style="left: 48%; width: 8px;  height: 8px;  animation-duration: 8s;  animation-delay: 1s;"></span>
+      <span class="ab" style="left: 60%; width: 5px;  height: 5px;  animation-duration: 6s;  animation-delay: 3s;"></span>
+      <span class="ab" style="left: 72%; width: 11px; height: 11px; animation-duration: 10s; animation-delay: 5s;"></span>
+      <span class="ab" style="left: 85%; width: 7px;  height: 7px;  animation-duration: 8s;  animation-delay: 2.5s;"></span>
+      <span class="ab" style="left: 92%; width: 9px;  height: 9px;  animation-duration: 9.5s; animation-delay: 6s;"></span>
+    </div>
     <div class="bubble-hint">
       <span>↔</span> Drag bubbles to rearrange
     </div>
