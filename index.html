@@ -4,23 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>$POOL — Pool Party</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Syne:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg-primary: #050510;
-  --bg-card: #0d0d1f;
-  --bg-card-hover: #141430;
-  --accent-gold: #f0c040;
-  --accent-cyan: #00e5ff;
+  --bg-primary: #0a1428;
+  --bg-card: #142b4a;
+  --bg-card-hover: #1c3a5e;
+  --accent-gold: #f5c842;
+  --accent-gold-dark: #d49820;
+  --accent-cyan: #4dc9ff;
   --accent-purple: #9945ff;
-  --accent-pink: #ff49db;
-  --accent-green: #00ff88;
-  --text-primary: #f0f0f5;
-  --text-secondary: #8888aa;
-  --text-dim: #555577;
-  --border: #1a1a3a;
-  --gradient-pool: linear-gradient(135deg, #00e5ff 0%, #9945ff 50%, #ff49db 100%);
-  --gradient-gold: linear-gradient(135deg, #f0c040, #ff8c00);
+  --accent-pink: #ff5fa8;
+  --accent-green: #6dd96d;
+  --accent-orange: #ff9933;
+  --text-primary: #fff8e0;
+  --text-secondary: #a8c8e8;
+  --text-dim: #6b88a8;
+  --border: #2a4a72;
+  --pixel-shadow: 4px 4px 0 #0a1428;
+  --pixel-shadow-sm: 2px 2px 0 #0a1428;
+  --gradient-pool: linear-gradient(180deg, #4dc9ff 0%, #2a8fcf 100%);
+  --gradient-gold: linear-gradient(180deg, #f5c842 0%, #d49820 100%);
+  --gradient-sunset: linear-gradient(180deg, #ff5fa8 0%, #ff9933 50%, #f5c842 100%);
+  --pixel-font: 'Press Start 2P', monospace;
+  --mono-font: 'VT323', monospace;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,6 +36,9 @@ html {
   scroll-behavior: smooth;
   background: var(--bg-primary);
   color: var(--text-primary);
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
 body {
@@ -36,49 +46,85 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px),
+    var(--bg-primary);
 }
 
-/* ── Ambient Background ── */
+/* Pixel font helper */
+.pixel-font { font-family: var(--pixel-font); letter-spacing: 0; }
+.mono-font { font-family: var(--mono-font); }
+
+/* ── Ambient Background — pixel sky/water ── */
 .ambient-bg {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(245,200,66,0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 80% 100%, rgba(77,201,255,0.10) 0%, transparent 50%),
+    linear-gradient(180deg, #0a1428 0%, #0d1f3a 50%, #0a1428 100%);
 }
 .ambient-bg .orb {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.15;
-  animation: orbFloat 20s ease-in-out infinite alternate;
+  opacity: 0;
+  display: none;
+  animation: orbFloat 24s steps(60) infinite alternate;
+  image-rendering: pixelated;
 }
 .ambient-bg .orb-1 {
-  width: 600px; height: 600px;
-  background: var(--accent-cyan);
-  top: -200px; left: -100px;
+  /* pixel cloud — top-left, well outside main content */
+  width: 140px; height: 56px;
+  top: 60px; left: 2%;
+  background:
+    radial-gradient(circle at 30% 60%, #fff 0 28px, transparent 29px),
+    radial-gradient(circle at 65% 50%, #fff 0 32px, transparent 33px);
+  filter: none;
 }
 .ambient-bg .orb-2 {
-  width: 500px; height: 500px;
-  background: var(--accent-purple);
-  bottom: -150px; right: -100px;
-  animation-delay: -7s;
+  /* pixel sun glow — bottom-right corner */
+  width: 200px; height: 200px;
+  bottom: 5%; right: 2%;
+  background: radial-gradient(circle, rgba(245,200,66,0.5) 0%, rgba(245,200,66,0.18) 40%, transparent 70%);
+  animation-delay: -8s;
+  opacity: 0.15;
 }
 .ambient-bg .orb-3 {
-  width: 400px; height: 400px;
-  background: var(--accent-gold);
-  top: 40%; left: 50%;
-  transform: translate(-50%, -50%);
+  /* additional small cloud — top-right edge */
+  width: 110px; height: 44px;
+  top: 18%; right: 4%;
+  background:
+    radial-gradient(circle at 25% 50%, #fff 0 22px, transparent 23px),
+    radial-gradient(circle at 70% 50%, #fff 0 22px, transparent 23px);
   animation-delay: -14s;
-  opacity: 0.08;
+  opacity: 0.06;
 }
 @keyframes orbFloat {
-  0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(40px, -30px) scale(1.1); }
-  100% { transform: translate(-20px, 20px) scale(0.95); }
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(40px, -10px); }
+  100% { transform: translate(-20px, 8px); }
 }
 
-/* ── Water Ripple ── */
+/* CRT scanlines + subtle vignette */
+.ambient-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.18) 0px,
+    rgba(0,0,0,0.18) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* ── Water Ripple — denser horizontal pixel bands ── */
 .water-ripple {
   position: fixed;
   inset: 0;
@@ -87,92 +133,108 @@ body {
   background: repeating-linear-gradient(
     0deg,
     transparent,
-    transparent 3px,
-    rgba(0, 229, 255, 0.01) 3px,
-    rgba(0, 229, 255, 0.01) 4px
+    transparent 4px,
+    rgba(77, 201, 255, 0.025) 4px,
+    rgba(77, 201, 255, 0.025) 6px
   );
-  animation: rippleShift 8s linear infinite;
+  animation: rippleShift 12s steps(40) infinite;
 }
 @keyframes rippleShift {
   0% { background-position: 0 0; }
-  100% { background-position: 0 200px; }
+  100% { background-position: 0 240px; }
 }
 
 .main-wrap { position: relative; z-index: 2; }
 
-/* ── Nav ── */
+/* All token icons stay crisp pixels */
+img[alt], .pair-img img, .nav-logo-icon img, .hero-coin img, .ticker-img {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* ── Nav — chunky pixel border ── */
 nav {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 100;
-  padding: 16px 40px;
+  padding: 14px 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  backdrop-filter: blur(20px);
-  background: rgba(5, 5, 16, 0.7);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(10, 20, 40, 0.92);
+  border-bottom: 3px solid var(--accent-gold);
+  box-shadow: 0 4px 0 rgba(212, 152, 32, 0.4), 0 6px 24px rgba(0,0,0,0.6);
 }
 .nav-logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   text-decoration: none;
 }
 .nav-logo-icon {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   overflow: hidden;
+  border: 2px solid var(--accent-gold);
+  box-shadow: var(--pixel-shadow-sm);
+  image-rendering: pixelated;
 }
-.nav-logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+.nav-logo-icon img { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; border-radius: 50%; }
 .nav-logo-text {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 22px;
-  color: var(--text-primary);
-  letter-spacing: -0.5px;
+  font-family: var(--pixel-font);
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--accent-gold);
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0 #0a1428;
 }
 .nav-logo-text span {
-  background: var(--gradient-pool);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: none;
+  -webkit-text-fill-color: var(--accent-pink);
+  color: var(--accent-pink);
 }
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 28px;
   list-style: none;
 }
 .nav-links a {
   color: var(--text-secondary);
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s;
-  letter-spacing: 0.5px;
+  font-weight: 400;
+  transition: color 0.1s steps(2);
+  letter-spacing: 1px;
   text-transform: uppercase;
-  font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-family: var(--pixel-font);
+  font-size: 9px;
 }
-.nav-links a:hover { color: var(--accent-cyan); }
+.nav-links a:hover { color: var(--accent-gold); text-shadow: 1px 1px 0 #0a1428; }
 .nav-cta {
-  padding: 10px 24px;
-  background: var(--gradient-pool);
-  border: none;
-  border-radius: 8px;
-  color: #000;
-  font-weight: 700;
-  font-size: 13px;
+  padding: 10px 22px;
+  background: var(--accent-gold);
+  border: 2px solid #0a1428;
+  border-radius: 0;
+  color: #0a1428;
+  font-weight: 400;
+  font-size: 9px;
   cursor: pointer;
   text-decoration: none;
-  font-family: 'Space Mono', monospace;
+  font-family: var(--pixel-font);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  letter-spacing: 1px;
+  transition: transform 0.05s steps(2), box-shadow 0.05s steps(2);
+  box-shadow: var(--pixel-shadow-sm);
 }
 .nav-cta:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(0, 229, 255, 0.3);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #0a1428;
+}
+.nav-cta:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
 }
 
 /* ── Hero ── */
@@ -188,24 +250,26 @@ nav {
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 20px;
-  border-radius: 100px;
-  border: 1px solid var(--border);
-  background: rgba(13, 13, 31, 0.8);
-  font-family: 'Space Mono', monospace;
-  font-size: 12px;
-  color: var(--accent-cyan);
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: 0;
+  border: 2px solid var(--accent-gold);
+  background: rgba(20, 43, 74, 0.85);
+  font-family: var(--pixel-font);
+  font-size: 9px;
+  color: var(--accent-gold);
   margin-bottom: 32px;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
   animation: fadeInDown 0.8s ease-out;
+  box-shadow: var(--pixel-shadow-sm);
 }
 .hero-badge .dot {
   width: 8px; height: 8px;
-  border-radius: 50%;
+  border-radius: 0;
   background: var(--accent-green);
-  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 0 1px #0a1428;
+  animation: pulse 1s steps(2) infinite;
 }
 @keyframes pulse {
   0%, 100% { opacity: 1; }
@@ -213,96 +277,131 @@ nav {
 }
 
 .hero-coin {
-  width: 200px; height: 200px;
+  width: 220px; height: 220px;
   border-radius: 50%;
   margin-bottom: 40px;
   position: relative;
-  animation: fadeInUp 1s ease-out 0.2s both, coinFloat 6s ease-in-out infinite;
+  animation: fadeInUp 1s ease-out 0.2s both, coinFloat 4s steps(20) infinite;
   overflow: hidden;
+  image-rendering: pixelated;
+  border: 4px solid var(--accent-gold);
+  box-shadow:
+    0 0 0 4px #0a1428,
+    8px 8px 0 rgba(212, 152, 32, 0.4);
 }
 .hero-coin img {
   width: 100%; height: 100%;
   border-radius: 50%;
   object-fit: cover;
+  image-rendering: pixelated;
 }
 .hero-coin::after {
   content: '';
   position: absolute;
-  inset: -4px;
+  inset: -16px;
   border-radius: 50%;
-  background: var(--gradient-pool);
+  background: radial-gradient(circle, rgba(245,200,66,0.4) 0%, transparent 70%);
   z-index: -1;
-  opacity: 0.6;
-  filter: blur(8px);
+  filter: none;
+  animation: glowPulse 3s steps(10) infinite;
 }
 @keyframes coinFloat {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
 
 .hero h1 {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: clamp(48px, 8vw, 96px);
-  line-height: 0.95;
-  letter-spacing: -3px;
-  margin-bottom: 24px;
+  font-family: var(--pixel-font);
+  font-weight: 400;
+  font-size: clamp(28px, 5.5vw, 56px);
+  line-height: 1.2;
+  letter-spacing: 2px;
+  margin-bottom: 28px;
   animation: fadeInUp 1s ease-out 0.4s both;
+  color: var(--accent-gold);
+  text-shadow:
+    4px 4px 0 #0a1428,
+    8px 8px 0 rgba(212, 152, 32, 0.4);
+  text-transform: uppercase;
 }
 .hero h1 .gradient {
-  background: var(--gradient-pool);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: none;
+  -webkit-text-fill-color: var(--accent-pink);
+  color: var(--accent-pink);
+  text-shadow:
+    4px 4px 0 #0a1428,
+    8px 8px 0 rgba(255, 95, 168, 0.3);
 }
 .hero-sub {
-  font-size: 18px;
+  font-family: var(--mono-font);
+  font-size: 22px;
   color: var(--text-secondary);
-  max-width: 560px;
-  line-height: 1.6;
+  max-width: 600px;
+  line-height: 1.4;
   margin-bottom: 48px;
   animation: fadeInUp 1s ease-out 0.6s both;
+  letter-spacing: 0.5px;
 }
 .hero-actions {
   display: flex;
-  gap: 16px;
+  gap: 18px;
   animation: fadeInUp 1s ease-out 0.8s both;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 .btn-primary {
-  padding: 14px 36px;
-  background: var(--gradient-pool);
-  border: none;
-  border-radius: 10px;
-  color: #000;
-  font-weight: 700;
-  font-size: 15px;
+  padding: 14px 28px;
+  background: var(--accent-pink);
+  border: 3px solid #0a1428;
+  border-radius: 0;
+  color: #fff8e0;
+  font-weight: 400;
+  font-size: 11px;
   cursor: pointer;
   text-decoration: none;
-  font-family: 'Syne', sans-serif;
-  letter-spacing: 0.5px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  font-family: var(--pixel-font);
+  letter-spacing: 1.5px;
+  transition: transform 0.05s steps(2), box-shadow 0.05s steps(2);
+  text-transform: uppercase;
+  box-shadow: var(--pixel-shadow);
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
 }
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 229, 255, 0.3);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #0a1428;
+}
+.btn-primary:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
 }
 .btn-secondary {
-  padding: 14px 36px;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text-primary);
-  font-weight: 600;
-  font-size: 15px;
+  padding: 14px 28px;
+  background: var(--accent-cyan);
+  border: 3px solid #0a1428;
+  border-radius: 0;
+  color: #0a1428;
+  font-weight: 400;
+  font-size: 11px;
   cursor: pointer;
   text-decoration: none;
-  font-family: 'Syne', sans-serif;
-  letter-spacing: 0.5px;
-  transition: all 0.2s;
+  font-family: var(--pixel-font);
+  letter-spacing: 1.5px;
+  transition: transform 0.05s steps(2), box-shadow 0.05s steps(2);
+  text-transform: uppercase;
+  box-shadow: var(--pixel-shadow);
 }
 .btn-secondary:hover {
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
-  background: rgba(0, 229, 255, 0.05);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #0a1428;
+  background: var(--accent-gold);
+}
+.btn-secondary:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
 }
 
 /* ── Stats Bar ── */
@@ -310,24 +409,27 @@ nav {
   display: flex;
   justify-content: center;
   gap: 60px;
-  padding: 48px 24px;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  background: rgba(13, 13, 31, 0.4);
+  padding: 40px 24px;
+  border-top: 3px solid var(--accent-gold);
+  border-bottom: 3px solid var(--accent-gold);
+  background: rgba(20, 43, 74, 0.6);
+  flex-wrap: wrap;
 }
 .stat-item { text-align: center; }
 .stat-value {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 36px;
-  background: var(--gradient-gold);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 4px;
+  font-family: var(--pixel-font);
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--accent-gold);
+  margin-bottom: 8px;
+  text-shadow: 3px 3px 0 #0a1428;
+  letter-spacing: 1px;
+  background: none;
+  -webkit-text-fill-color: var(--accent-gold);
 }
 .stat-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-family: var(--pixel-font);
+  font-size: 8px;
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -342,30 +444,37 @@ section {
 .section-header { text-align: center; margin-bottom: 64px; }
 .section-tag {
   display: inline-block;
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  color: var(--accent-cyan);
+  font-family: var(--pixel-font);
+  font-size: 9px;
+  color: var(--accent-pink);
   text-transform: uppercase;
-  letter-spacing: 3px;
-  margin-bottom: 16px;
-  padding: 6px 16px;
-  border: 1px solid rgba(0, 229, 255, 0.2);
-  border-radius: 100px;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  padding: 8px 16px;
+  border: 2px solid var(--accent-pink);
+  border-radius: 0;
+  background: rgba(255, 95, 168, 0.1);
+  box-shadow: var(--pixel-shadow-sm);
 }
 .section-title {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: clamp(32px, 5vw, 52px);
-  letter-spacing: -1.5px;
-  line-height: 1.1;
-  margin-bottom: 16px;
+  font-family: var(--pixel-font);
+  font-weight: 400;
+  font-size: clamp(20px, 3.6vw, 36px);
+  letter-spacing: 1.5px;
+  line-height: 1.3;
+  margin-bottom: 20px;
+  color: var(--accent-gold);
+  text-shadow: 3px 3px 0 #0a1428;
+  text-transform: uppercase;
 }
 .section-desc {
   color: var(--text-secondary);
-  font-size: 16px;
-  max-width: 600px;
+  font-family: var(--mono-font);
+  font-size: 20px;
+  max-width: 640px;
   margin: 0 auto;
-  line-height: 1.6;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
 }
 
 /* ── How It Works ── */
@@ -376,57 +485,63 @@ section {
 }
 .how-card {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 40px 32px;
+  border: 3px solid var(--accent-gold);
+  border-radius: 0;
+  padding: 36px 28px;
   position: relative;
   overflow: hidden;
-  transition: border-color 0.3s, transform 0.3s;
+  transition: transform 0.1s steps(2), box-shadow 0.1s steps(2);
+  box-shadow: var(--pixel-shadow);
 }
 .how-card:hover {
-  border-color: rgba(0, 229, 255, 0.3);
-  transform: translateY(-4px);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #0a1428;
 }
 .how-card::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--gradient-pool);
-  opacity: 0;
-  transition: opacity 0.3s;
+  height: 4px;
+  background: var(--accent-pink);
+  opacity: 1;
 }
-.how-card:hover::before { opacity: 1; }
 .how-num {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 56px;
-  background: var(--gradient-pool);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  opacity: 0.3;
+  font-family: var(--pixel-font);
+  font-weight: 400;
+  font-size: 32px;
+  color: var(--accent-pink);
+  opacity: 0.9;
   line-height: 1;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
+  text-shadow: 3px 3px 0 #0a1428;
+  background: none;
+  -webkit-text-fill-color: var(--accent-pink);
 }
 .how-card h3 {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 20px;
-  margin-bottom: 12px;
+  font-family: var(--pixel-font);
+  font-weight: 400;
+  font-size: 13px;
+  margin-bottom: 16px;
+  color: var(--accent-gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1.4;
 }
 .how-card p {
   color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.6;
+  font-family: var(--mono-font);
+  font-size: 18px;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
 }
 
 /* ── Marquee ── */
 .marquee-wrap {
   overflow: hidden;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  border-top: 3px solid var(--accent-gold);
+  border-bottom: 3px solid var(--accent-gold);
   padding: 14px 0;
-  background: rgba(13, 13, 31, 0.5);
+  background: rgba(20, 43, 74, 0.7);
 }
 .marquee-track {
   display: flex;
@@ -438,10 +553,11 @@ section {
 .marquee-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-family: 'Space Mono', monospace;
-  font-size: 13px;
+  gap: 10px;
+  font-family: var(--mono-font);
+  font-size: 18px;
   color: var(--text-secondary);
+  letter-spacing: 0.5px;
 }
 .marquee-item .tag { color: var(--accent-gold); font-weight: 700; }
 .marquee-item .green { color: var(--accent-green); }
@@ -451,8 +567,8 @@ section {
   font-weight: 700;
 }
 .marquee-sep {
-  color: var(--text-dim);
-  font-size: 8px;
+  color: var(--accent-pink);
+  font-size: 12px;
 }
 @keyframes marqueeScroll {
   0% { transform: translateX(0); }
@@ -464,36 +580,47 @@ section {
 .pool-table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 0 8px;
+  border-spacing: 0 6px;
 }
 .pool-table thead th {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  color: var(--text-dim);
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  color: var(--accent-gold);
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   padding: 0 20px 16px;
   text-align: left;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 3px solid var(--accent-gold);
 }
 .pool-table thead th:last-child { text-align: right; }
 
 
 .pool-row {
   background: var(--bg-card);
-  transition: all 0.3s;
+  transition: transform 0.1s steps(2), background 0.1s steps(2);
   cursor: pointer;
+  border: 2px solid transparent;
 }
 .pool-row:hover {
   background: var(--bg-card-hover);
-  transform: scale(1.005);
+  transform: translateX(-2px);
 }
 .pool-row td {
-  padding: 20px;
+  padding: 18px 20px;
   vertical-align: middle;
+  border-top: 2px solid var(--border);
+  border-bottom: 2px solid var(--border);
 }
-.pool-row td:first-child { border-radius: 12px 0 0 12px; }
-.pool-row td:last-child { border-radius: 0 12px 12px 0; text-align: right; }
+.pool-row td:first-child {
+  border-left: 2px solid var(--border);
+  border-radius: 0;
+}
+.pool-row td:last-child {
+  border-right: 2px solid var(--border);
+  border-radius: 0;
+  text-align: right;
+}
+.pool-row:hover td { border-color: var(--accent-gold); }
 
 
 .pool-pair {
@@ -508,26 +635,34 @@ section {
 .pool-pair-icons .icon {
   width: 44px; height: 44px;
   border-radius: 50%;
-  border: 2px solid var(--bg-primary);
+  border: 2px solid var(--accent-gold);
   object-fit: cover;
   overflow: hidden;
   flex-shrink: 0;
+  image-rendering: pixelated;
+  box-shadow: var(--pixel-shadow-sm);
 }
 .pool-pair-icons .icon img {
   width: 100%; height: 100%;
   object-fit: cover;
   border-radius: 50%;
+  image-rendering: pixelated;
 }
-.pool-pair-icons .icon:nth-child(2) { margin-left: -12px; }
+.pool-pair-icons .icon:nth-child(2) { margin-left: -10px; }
 .pool-pair-info .pair-name {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 16px;
+  font-family: var(--pixel-font);
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--accent-gold);
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 0 #0a1428;
 }
 .pool-pair-info .pair-platform {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text-dim);
-  margin-top: 2px;
+  margin-top: 4px;
+  font-family: var(--mono-font);
+  letter-spacing: 0.5px;
 }
 
 
@@ -535,40 +670,44 @@ section {
 .pool-table thead th.sortable {
   cursor: pointer;
   user-select: none;
-  transition: color 0.2s;
+  transition: color 0.1s steps(2);
   position: relative;
   white-space: nowrap;
 }
 .pool-table thead th.sortable:hover {
-  color: var(--accent-cyan);
+  color: var(--accent-pink);
 }
 .pool-table thead th .sort-arrow {
   display: inline-block;
   margin-left: 6px;
-  font-size: 10px;
+  font-size: 8px;
   opacity: 0.3;
-  transition: opacity 0.2s;
+  transition: opacity 0.1s steps(2);
 }
 .pool-table thead th.active .sort-arrow {
   opacity: 1;
-  color: var(--accent-cyan);
+  color: var(--accent-pink);
 }
 .pool-mcap {
-  font-family: 'Space Mono', monospace;
+  font-family: var(--mono-font);
   font-weight: 700;
-  font-size: 15px;
+  font-size: 22px;
   color: var(--accent-gold);
+  letter-spacing: 0.5px;
 }
 .pool-tvl {
-  font-family: 'Space Mono', monospace;
+  font-family: var(--mono-font);
   font-weight: 700;
-  font-size: 15px;
+  font-size: 22px;
+  letter-spacing: 0.5px;
+  color: var(--accent-cyan);
 }
 .pool-change {
-  font-family: 'Space Mono', monospace;
+  font-family: var(--mono-font);
   font-weight: 700;
-  font-size: 15px;
+  font-size: 22px;
   color: var(--text-secondary);
+  letter-spacing: 0.5px;
 }
 .pool-change.up { color: var(--accent-green); }
 .pool-change.down { color: #ff4466; }
@@ -579,30 +718,26 @@ section {
   position: relative;
   width: 100%;
   height: 560px;
-  border-radius: 24px;
-  /* Layered "pool water" background:
-     1. Deep gradient — looking down into water (light at top, dark at bottom)
-     2. A radial highlight to suggest a sunbeam falling onto the surface
-     3. Base color falls back to a deep teal */
+  border-radius: 0;
+  /* Pool water — flat retro 16-bit look */
   background:
-    radial-gradient(ellipse 60% 40% at 50% 20%, rgba(120, 220, 255, 0.18) 0%, transparent 60%),
+    repeating-linear-gradient(0deg,
+      rgba(255,255,255,0.04) 0px,
+      rgba(255,255,255,0.04) 2px,
+      transparent 2px,
+      transparent 6px),
     linear-gradient(to bottom,
-      rgba(0, 200, 230, 0.18) 0%,
-      rgba(0, 120, 180, 0.22) 40%,
-      rgba(0, 60, 120, 0.28) 100%),
-    #08182a;
-  border: 1px solid rgba(80, 200, 255, 0.18);
+      #4dc9ff 0%,
+      #2a8fcf 35%,
+      #1a5a9c 70%,
+      #0d3a6c 100%);
+  border: 4px solid var(--accent-gold);
+  box-shadow: var(--pixel-shadow), inset 0 0 0 2px rgba(0,0,0,0.3);
   overflow: hidden;
   touch-action: none;
-  /* Inner shadow gives the impression of a sunken pool */
-  box-shadow:
-    inset 0 12px 40px rgba(0, 0, 0, 0.55),
-    inset 0 -8px 30px rgba(0, 0, 0, 0.35),
-    0 0 60px rgba(0, 180, 255, 0.06);
+  image-rendering: pixelated;
 }
-/* Animated caustics overlay — refracted light shimmer on the pool floor.
-   Two layered SVG patterns drift in opposite directions for that "rippling
-   reflection" feel. */
+/* Caustics — soft light shimmer across the pool (no sparkle dots) */
 .bubble-stage::before {
   content: '';
   position: absolute;
@@ -611,57 +746,41 @@ section {
   background-image:
     radial-gradient(ellipse 200px 80px at 20% 30%, rgba(180, 240, 255, 0.10), transparent 70%),
     radial-gradient(ellipse 240px 100px at 70% 50%, rgba(180, 240, 255, 0.08), transparent 70%),
-    radial-gradient(ellipse 160px 60px at 40% 75%, rgba(180, 240, 255, 0.10), transparent 70%),
-    radial-gradient(ellipse 220px 90px at 85% 20%, rgba(180, 240, 255, 0.07), transparent 70%),
-    radial-gradient(ellipse 180px 70px at 10% 80%, rgba(180, 240, 255, 0.09), transparent 70%);
-  background-size: 100% 100%;
-  mix-blend-mode: screen;
-  animation: poolCaustics 14s ease-in-out infinite alternate;
+    radial-gradient(ellipse 160px 60px at 40% 75%, rgba(180, 240, 255, 0.10), transparent 70%);
+  animation: poolCaustics 14s steps(20) infinite alternate;
   z-index: 0;
 }
-/* Water surface gloss — a thin highlight at the very top, like the meniscus. */
+/* Retro water surface highlight band */
 .bubble-stage::after {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 8px;
   pointer-events: none;
-  background: linear-gradient(to bottom,
-    rgba(255, 255, 255, 0.10) 0%,
-    rgba(180, 240, 255, 0.04) 40%,
-    transparent 100%);
+  background: repeating-linear-gradient(90deg,
+    rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 8px,
+    transparent 8px, transparent 16px);
   z-index: 0;
 }
 @keyframes poolCaustics {
-  0%   { transform: translate( 0,  0) scale(1.0);   opacity: 0.85; }
-  50%  { transform: translate(20px, -10px) scale(1.05); opacity: 1.0; }
-  100% { transform: translate(-15px, 8px) scale(0.98);  opacity: 0.85; }
+  0%   { transform: translate( 0,  0); opacity: 0.6; }
+  50%  { transform: translate(8px, -4px); opacity: 1; }
+  100% { transform: translate(-6px, 4px);  opacity: 0.6; }
 }
-/* Tiny ambient bubbles rising in the water column. Pure decoration —
-   non-interactive, doesn't affect physics. */
+/* Pixel bubbles rising — disabled per request */
 .pool-ambient {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 0;
+  display: none;
 }
 .pool-ambient .ab {
-  position: absolute;
-  bottom: -20px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.7), rgba(180,240,255,0.15) 60%, transparent 80%);
-  box-shadow: inset 0 0 6px rgba(255,255,255,0.4);
-  animation: ambientRise linear infinite;
-  opacity: 0;
+  display: none;
 }
 @keyframes ambientRise {
   0%   { transform: translateY(0)      translateX(0); opacity: 0; }
-  10%  { opacity: 0.6; }
-  50%  { transform: translateY(-280px) translateX(8px);  opacity: 0.4; }
-  90%  { opacity: 0.2; }
+  10%  { opacity: 0.7; }
+  50%  { transform: translateY(-280px) translateX(8px);  opacity: 0.5; }
+  90%  { opacity: 0.3; }
   100% { transform: translateY(-580px) translateX(-6px); opacity: 0; }
 }
 .bubble-hint {
@@ -669,25 +788,21 @@ section {
   top: 16px;
   left: 50%;
   transform: translateX(-50%);
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  color: rgba(220, 245, 255, 0.85);
+  font-family: var(--pixel-font);
+  font-size: 9px;
+  color: #fff8e0;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   pointer-events: none;
   z-index: 2;
-  opacity: 0.85;
-  text-shadow: 0 1px 4px rgba(0, 30, 60, 0.6);
+  opacity: 0.95;
+  text-shadow: 2px 2px 0 #0a1428;
 }
 .bubble-hint span {
-  color: #aef0ff;
+  color: var(--accent-gold);
   margin-right: 6px;
 }
-/* Each bubble is a glassy water droplet:
-   - Translucent cyan fill, blurred backdrop
-   - Top-left specular highlight (::before)
-   - Bottom inner reflection ring (::after)
-   - Soft cyan halo around the whole thing */
+/* Pixel-style float bubbles — flat coin/inner-tube look */
 .bubble {
   position: absolute;
   border-radius: 50%;
@@ -700,151 +815,132 @@ section {
   -webkit-user-select: none;
   text-align: center;
   background:
-    radial-gradient(circle at 30% 25%, rgba(255,255,255,0.18) 0%, transparent 35%),
-    radial-gradient(circle at 70% 80%, rgba(0, 80, 140, 0.35) 0%, transparent 50%),
-    linear-gradient(160deg, rgba(80, 200, 255, 0.28), rgba(0, 100, 160, 0.45));
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border: 1.5px solid rgba(180, 240, 255, 0.55);
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,0.35) 0%, transparent 30%),
+    radial-gradient(circle at 50% 50%, var(--accent-gold) 0%, var(--accent-gold-dark) 100%);
+  border: 3px solid #0a1428;
   box-shadow:
-    inset 0 8px 18px rgba(255, 255, 255, 0.18),
-    inset 0 -10px 20px rgba(0, 30, 60, 0.45),
-    0 0 24px rgba(0, 200, 255, 0.18),
-    0 6px 18px rgba(0, 30, 80, 0.4);
-  transition: box-shadow 0.2s, border-color 0.2s, transform 0.05s linear;
+    var(--pixel-shadow-sm),
+    inset 0 0 0 2px rgba(255,255,255,0.2);
+  transition: transform 0.05s linear;
   will-change: transform;
   overflow: hidden;
   z-index: 1;
+  image-rendering: pixelated;
 }
-/* Specular highlight — the bright "shine" spot on a water bead's top-left */
+/* Highlight removed - was creating a white box overlapping logos */
 .bubble::before {
-  content: '';
-  position: absolute;
-  top: 8%;
-  left: 14%;
-  width: 32%;
-  height: 22%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at center,
-    rgba(255, 255, 255, 0.85) 0%,
-    rgba(255, 255, 255, 0.25) 45%,
-    transparent 75%);
-  filter: blur(1px);
-  pointer-events: none;
-  z-index: 3;
+  content: none;
 }
-/* Inner rim glow on the lower half — gives that "tension" surface curve */
+/* Disabled glossy ring */
 .bubble::after {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 50%;
   pointer-events: none;
-  background: radial-gradient(circle at 50% 110%,
-    rgba(180, 240, 255, 0.35) 0%,
-    transparent 35%);
   z-index: 2;
 }
 .bubble:hover {
-  border-color: rgba(220, 250, 255, 0.85);
+  transform: translate(-1px, -1px);
   box-shadow:
-    inset 0 8px 18px rgba(255, 255, 255, 0.25),
-    inset 0 -10px 20px rgba(0, 30, 60, 0.45),
-    0 0 36px rgba(0, 220, 255, 0.40),
-    0 6px 18px rgba(0, 30, 80, 0.4);
+    3px 3px 0 #0a1428,
+    inset 0 0 0 2px rgba(255,255,255,0.3);
 }
 .bubble.dragging {
   cursor: grabbing;
   z-index: 10;
-  border-color: rgba(220, 250, 255, 0.95);
   box-shadow:
-    inset 0 8px 18px rgba(255, 255, 255, 0.30),
-    inset 0 -10px 20px rgba(0, 30, 60, 0.40),
-    0 0 48px rgba(0, 220, 255, 0.55),
-    0 8px 24px rgba(0, 30, 80, 0.5);
+    4px 4px 0 #0a1428,
+    inset 0 0 0 2px rgba(255,255,255,0.4);
 }
 .bubble-icon {
-  width: 38%;
-  height: 38%;
+  width: 42%;
+  height: 42%;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 4px;
   pointer-events: none;
   position: relative;
   z-index: 4;
-  /* A very faint white ring so the icon reads as floating inside water */
-  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.25), 0 2px 6px rgba(0, 20, 40, 0.5);
+  border: 2px solid #0a1428;
+  image-rendering: pixelated;
 }
 .bubble-ticker {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.5px;
+  font-family: var(--pixel-font);
+  font-weight: 400;
+  color: #0a1428;
+  letter-spacing: 1px;
   pointer-events: none;
-  line-height: 1;
+  line-height: 1.2;
   white-space: nowrap;
   position: relative;
   z-index: 4;
-  text-shadow: 0 1px 3px rgba(0, 30, 60, 0.7), 0 0 8px rgba(0, 80, 160, 0.5);
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
 }
 .bubble-value {
-  font-family: 'Space Mono', monospace;
-  color: #aef0ff;
+  font-family: var(--mono-font);
+  color: #0a1428;
   font-weight: 700;
-  margin-top: 2px;
+  margin-top: 4px;
   pointer-events: none;
   line-height: 1;
   white-space: nowrap;
   position: relative;
   z-index: 4;
-  text-shadow: 0 1px 2px rgba(0, 30, 60, 0.7);
+  font-size: 1.1em;
 }
 @media (max-width: 768px) {
   .bubble-stage { height: 460px; }
 }
 .pool-apy {
-  font-family: 'Space Mono', monospace;
+  font-family: var(--mono-font);
   font-weight: 700;
-  font-size: 15px;
+  font-size: 22px;
   color: var(--accent-green);
+  letter-spacing: 0.5px;
 }
 .pool-volume {
-  font-family: 'Space Mono', monospace;
-  font-size: 14px;
+  font-family: var(--mono-font);
+  font-size: 18px;
   color: var(--text-secondary);
 }
 .pool-action-btn {
-  padding: 10px 24px;
-  background: transparent;
-  border: 1px solid var(--accent-cyan);
-  border-radius: 8px;
-  color: var(--accent-cyan);
-  font-weight: 600;
-  font-size: 13px;
+  padding: 10px 18px;
+  background: var(--accent-cyan);
+  border: 2px solid #0a1428;
+  border-radius: 0;
+  color: #0a1428;
+  font-weight: 400;
+  font-size: 9px;
   cursor: pointer;
-  font-family: 'Space Mono', monospace;
+  font-family: var(--pixel-font);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.2s;
+  letter-spacing: 1px;
+  transition: transform 0.05s steps(2), box-shadow 0.05s steps(2);
   text-decoration: none;
   white-space: nowrap;
+  box-shadow: var(--pixel-shadow-sm);
 }
 .pool-action-btn:hover {
-  background: rgba(0, 229, 255, 0.1);
-  box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #0a1428;
+}
+.pool-action-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
 }
 .solscan-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
-  min-width: 42px;
-  border-color: rgba(0, 232, 181, 0.5);
+  padding: 7px 8px;
+  min-width: 36px;
+  background: #1a3550;
+  border-color: #0a1428;
 }
 .solscan-btn:hover {
-  background: rgba(0, 232, 181, 0.1);
-  border-color: rgba(0, 232, 181, 0.8);
-  box-shadow: 0 0 20px rgba(0, 232, 181, 0.2);
+  background: #234870;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #0a1428;
 }
 .solscan-icon {
   display: block;
@@ -855,25 +951,30 @@ section {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
-  min-width: 42px;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  padding: 7px 8px;
+  min-width: 36px;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 0;
   color: var(--text-secondary);
   cursor: pointer;
-  font-family: 'Space Mono', monospace;
-  font-size: 13px;
-  font-weight: 600;
-  transition: all 0.2s;
+  font-family: var(--pixel-font);
+  font-size: 9px;
+  font-weight: 400;
+  transition: transform 0.05s steps(2), box-shadow 0.05s steps(2), color 0.1s steps(2);
   outline: none;
   line-height: 1;
+  box-shadow: var(--pixel-shadow-sm);
 }
 .copy-ca-btn:hover:not(:disabled) {
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
-  background: rgba(0, 229, 255, 0.06);
-  box-shadow: 0 0 16px rgba(0, 229, 255, 0.15);
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #0a1428;
+}
+.copy-ca-btn:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: none;
 }
 .copy-ca-btn:disabled {
   opacity: 0.4;
@@ -882,7 +983,7 @@ section {
 .copy-ca-btn.copied {
   border-color: var(--accent-green);
   color: var(--accent-green);
-  background: rgba(0, 255, 136, 0.06);
+  background: rgba(109, 217, 109, 0.12);
 }
 .copy-ca-btn svg {
   display: block;
@@ -890,40 +991,49 @@ section {
 }
 .pool-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
   justify-content: flex-end;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
+.pool-row td:last-child { min-width: 200px; }
 .zap-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 16px;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 165, 0, 0.1));
-  border: 1px solid rgba(255, 215, 0, 0.5);
-  border-radius: 8px;
-  color: #ffd700;
-  font-weight: 700;
-  font-size: 13px;
+  gap: 5px;
+  padding: 8px 12px;
+  background: var(--accent-gold);
+  border: 2px solid #0a1428;
+  border-radius: 0;
+  color: #0a1428;
+  font-weight: 400;
+  font-size: 8px;
   cursor: pointer;
-  font-family: 'Space Mono', monospace;
+  font-family: var(--pixel-font);
   text-decoration: none;
-  transition: all 0.2s;
+  transition: transform 0.05s steps(2), box-shadow 0.05s steps(2);
   white-space: nowrap;
   outline: none;
   line-height: 1;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: var(--pixel-shadow-sm);
 }
 .zap-btn:focus { outline: none; }
 .zap-btn:hover {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(255, 165, 0, 0.18));
-  border-color: rgba(255, 215, 0, 0.8);
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.25);
-  transform: translateY(-1px);
+  background: #ffd757;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #0a1428;
+}
+.zap-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
 }
 .zap-btn .zap-icon {
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1;
-  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
+  filter: none;
 }
 
 /* ── Tokenomics ── */
@@ -934,35 +1044,46 @@ section {
 }
 .tok-card {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 36px;
-  transition: border-color 0.3s;
+  border: 3px solid var(--accent-gold);
+  border-radius: 0;
+  padding: 32px;
+  transition: transform 0.1s steps(2), box-shadow 0.1s steps(2);
+  box-shadow: var(--pixel-shadow);
 }
-.tok-card:hover { border-color: rgba(0, 229, 255, 0.2); }
+.tok-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #0a1428;
+}
 .tok-card .tok-icon {
-  width: 48px; height: 48px;
-  border-radius: 12px;
+  width: 52px; height: 52px;
+  border-radius: 0;
+  border: 2px solid #0a1428;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 22px;
   margin-bottom: 20px;
+  box-shadow: var(--pixel-shadow-sm);
 }
-.tok-card .tok-icon.cyan { background: rgba(0, 229, 255, 0.1); }
-.tok-card .tok-icon.purple { background: rgba(153, 69, 255, 0.1); }
-.tok-card .tok-icon.gold { background: rgba(240, 192, 64, 0.1); }
-.tok-card .tok-icon.green { background: rgba(0, 255, 136, 0.1); }
+.tok-card .tok-icon.cyan { background: var(--accent-cyan); }
+.tok-card .tok-icon.purple { background: var(--accent-pink); }
+.tok-card .tok-icon.gold { background: var(--accent-gold); }
+.tok-card .tok-icon.green { background: var(--accent-green); }
 .tok-card h3 {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 18px;
-  margin-bottom: 10px;
+  font-family: var(--pixel-font);
+  font-weight: 400;
+  font-size: 13px;
+  margin-bottom: 14px;
+  color: var(--accent-gold);
+  letter-spacing: 1px;
+  line-height: 1.4;
 }
 .tok-card p {
   color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.6;
+  font-family: var(--mono-font);
+  font-size: 18px;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
 }
 
 /* ── CTA ── */
@@ -975,22 +1096,28 @@ section {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, rgba(0, 229, 255, 0.05), transparent 70%);
+  background: radial-gradient(ellipse at center, rgba(245,200,66,0.08), transparent 70%);
   pointer-events: none;
 }
 .cta-section h2 {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: clamp(36px, 5vw, 56px);
-  letter-spacing: -2px;
-  margin-bottom: 20px;
+  font-family: var(--pixel-font);
+  font-weight: 400;
+  font-size: clamp(20px, 3.5vw, 38px);
+  letter-spacing: 1.5px;
+  margin-bottom: 24px;
+  color: var(--accent-gold);
+  text-shadow: 4px 4px 0 #0a1428;
+  text-transform: uppercase;
+  line-height: 1.3;
 }
 .cta-section p {
   color: var(--text-secondary);
-  font-size: 16px;
-  max-width: 500px;
+  font-family: var(--mono-font);
+  font-size: 20px;
+  max-width: 540px;
   margin: 0 auto 40px;
-  line-height: 1.6;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
 }
 .cta-buttons {
   display: flex;
@@ -1001,8 +1128,8 @@ section {
 
 /* ── Footer ── */
 footer {
-  border-top: 1px solid var(--border);
-  padding: 48px 40px;
+  border-top: 3px solid var(--accent-gold);
+  padding: 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1012,67 +1139,75 @@ footer {
 .footer-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 .footer-left .flogo {
-  width: 32px; height: 32px;
+  width: 36px; height: 36px;
   border-radius: 50%;
   overflow: hidden;
+  border: 2px solid var(--accent-gold);
+  image-rendering: pixelated;
 }
-.footer-left .flogo img { width: 100%; height: 100%; object-fit: cover; }
+.footer-left .flogo img { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; border-radius: 50%; }
 .footer-left span {
-  font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-family: var(--pixel-font);
+  font-size: 8px;
   color: var(--text-dim);
+  letter-spacing: 1px;
 }
 .footer-links { display: flex; gap: 24px; }
 .footer-links a {
   color: var(--text-dim);
   text-decoration: none;
-  font-size: 13px;
-  transition: color 0.2s;
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.1s steps(2);
 }
-.footer-links a:hover { color: var(--accent-cyan); }
+.footer-links a:hover { color: var(--accent-gold); }
 
 
 
 
-/* ── Hero Price Row ── */
 /* ── Hero Price Row ── */
 .hero-price-row {
   display: flex;
   align-items: center;
   gap: 24px;
   margin-bottom: 28px;
-  padding: 12px 28px;
-  background: rgba(13, 13, 31, 0.8);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  padding: 14px 28px;
+  background: var(--bg-card);
+  border: 2px solid var(--accent-gold);
+  border-radius: 0;
   animation: fadeInUp 1s ease-out 0.3s both;
+  box-shadow: var(--pixel-shadow);
 }
 .hp-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 .hp-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  color: var(--text-dim);
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  color: var(--accent-pink);
   text-transform: uppercase;
   letter-spacing: 1.5px;
 }
 .hp-val {
-  font-family: 'Space Mono', monospace;
-  font-size: 16px;
+  font-family: var(--mono-font);
+  font-size: 20px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--accent-gold);
+  letter-spacing: 0.5px;
 }
 .hp-divider {
-  width: 1px;
+  width: 2px;
   height: 32px;
-  background: var(--border);
+  background: var(--accent-gold);
+  opacity: 0.5;
 }
 
 @media (max-width: 768px) {
@@ -1109,31 +1244,37 @@ footer {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border);
-  border-radius: 100px;
+  padding: 7px 14px;
+  background: var(--bg-card);
+  border: 2px solid var(--accent-gold);
+  border-radius: 0;
+  box-shadow: var(--pixel-shadow-sm);
 }
 .nav-price-label {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--text-primary);
+  font-family: var(--pixel-font);
+  font-weight: 400;
+  font-size: 9px;
+  color: var(--accent-gold);
+  letter-spacing: 1px;
 }
 .nav-price-val {
-  font-family: 'Space Mono', monospace;
-  font-size: 13px;
+  font-family: var(--mono-font);
+  font-size: 16px;
   color: var(--accent-green);
   font-weight: 700;
+  letter-spacing: 0.5px;
 }
 .nav-mcap {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-family: var(--mono-font);
+  font-size: 14px;
   color: var(--text-dim);
 }
 .nav-mcap::before {
   content: 'MC ';
   color: var(--text-dim);
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  margin-right: 4px;
 }
 
 /* ── Contract Address ── */
@@ -1141,14 +1282,14 @@ footer {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 32px;
   animation: fadeInUp 1s ease-out 0.7s both;
 }
 .ca-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  color: var(--text-dim);
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  color: var(--accent-pink);
   text-transform: uppercase;
   letter-spacing: 2px;
 }
@@ -1156,32 +1297,34 @@ footer {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 20px;
-  background: rgba(13, 13, 31, 0.8);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  padding: 10px 18px;
+  background: var(--bg-card);
+  border: 2px solid var(--accent-gold);
+  border-radius: 0;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: transform 0.05s steps(2), box-shadow 0.05s steps(2);
   max-width: 100%;
+  box-shadow: var(--pixel-shadow-sm);
 }
 .ca-box:hover {
-  border-color: var(--accent-cyan);
-  background: rgba(0, 229, 255, 0.03);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #0a1428;
 }
 .ca-text {
-  font-family: 'Space Mono', monospace;
-  font-size: 13px;
+  font-family: var(--mono-font);
+  font-size: 16px;
   color: var(--text-secondary);
   word-break: break-all;
   user-select: all;
+  letter-spacing: 0.5px;
 }
 .ca-copy {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  color: var(--accent-cyan);
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  color: var(--accent-gold);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -1190,41 +1333,42 @@ footer {
 .pool-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
   max-width: 560px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   animation: fadeInUp 1s ease-out 0.65s both;
 }
 .pool-stat {
   padding: 18px 20px;
-  background: rgba(13, 13, 31, 0.8);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  background: var(--bg-card);
+  border: 2px solid var(--accent-pink);
+  border-radius: 0;
   text-align: center;
-  transition: border-color 0.2s, background 0.2s;
+  transition: transform 0.05s steps(2), box-shadow 0.05s steps(2);
+  box-shadow: var(--pixel-shadow-sm);
 }
 .pool-stat:hover {
-  border-color: var(--accent-cyan);
-  background: rgba(0, 229, 255, 0.03);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #0a1428;
 }
 .pool-stat-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  color: var(--text-dim);
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  color: var(--accent-pink);
   text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 8px;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
 }
 .pool-stat-value {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 24px;
-  background: var(--gradient-pool);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-family: var(--mono-font);
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--accent-gold);
   line-height: 1.2;
-  letter-spacing: -0.5px;
+  letter-spacing: 0.5px;
+  background: none;
+  -webkit-text-fill-color: var(--accent-gold);
 }
 @media (max-width: 480px) {
   .pool-stats { grid-template-columns: 1fr; }
@@ -1233,50 +1377,55 @@ footer {
 
 .staking-amount-display {
   text-align: center;
-  padding: 40px 24px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 36px 24px;
+  background: var(--bg-card);
+  border-radius: 0;
+  border: 3px solid var(--accent-gold);
+  box-shadow: var(--pixel-shadow);
 }
 .staked-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  color: var(--text-dim);
+  font-family: var(--pixel-font);
+  font-size: 9px;
+  color: var(--accent-pink);
   text-transform: uppercase;
   letter-spacing: 2px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 .staked-value {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 42px;
-  background: var(--gradient-pool);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  line-height: 1.2;
+  font-family: var(--pixel-font);
+  font-weight: 400;
+  font-size: 28px;
+  color: var(--accent-gold);
+  line-height: 1.3;
+  letter-spacing: 1px;
+  text-shadow: 3px 3px 0 #0a1428;
+  background: none;
+  -webkit-text-fill-color: var(--accent-gold);
 }
 .staked-usd {
-  font-family: 'Space Mono', monospace;
-  font-size: 14px;
+  font-family: var(--mono-font);
+  font-size: 18px;
   color: var(--text-secondary);
-  margin-top: 8px;
+  margin-top: 12px;
+  letter-spacing: 0.3px;
 }
 
 /* ── Staking ── */
 .staking-card {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 40px;
+  border: 3px solid var(--accent-gold);
+  border-radius: 0;
+  padding: 36px;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--pixel-shadow);
 }
 .staking-card::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 3px;
-  background: var(--gradient-pool);
+  height: 4px;
+  background: var(--accent-pink);
 }
 .staking-top {
   display: flex;
@@ -1292,81 +1441,97 @@ footer {
   gap: 20px;
 }
 .staking-icon-wrap {
-  width: 56px; height: 56px;
+  width: 60px; height: 60px;
   border-radius: 50%;
   overflow: hidden;
   position: relative;
+  border: 3px solid var(--accent-gold);
+  image-rendering: pixelated;
+  box-shadow: var(--pixel-shadow-sm);
 }
 .staking-icon-wrap::after {
   content: '';
   position: absolute;
   inset: -3px;
   border-radius: 50%;
-  background: var(--gradient-pool);
+  background: none;
   z-index: -1;
-  opacity: 0.5;
-  filter: blur(6px);
+  filter: none;
 }
 .staking-coin {
   width: 100%; height: 100%;
   object-fit: cover;
   border-radius: 50%;
+  image-rendering: pixelated;
 }
 .staking-top h3 {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 22px;
+  font-family: var(--pixel-font);
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--accent-gold);
+  letter-spacing: 1px;
+  line-height: 1.3;
 }
 .staking-subtitle {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-dim);
-  margin-top: 2px;
-  font-family: 'Space Mono', monospace;
+  margin-top: 6px;
+  font-family: var(--mono-font);
+  letter-spacing: 0.3px;
 }
 .btn-stake {
-  padding: 14px 32px;
-  background: var(--gradient-pool);
-  border: none;
-  border-radius: 10px;
-  color: #000;
-  font-weight: 700;
-  font-size: 14px;
+  padding: 14px 26px;
+  background: var(--accent-pink);
+  border: 3px solid #0a1428;
+  border-radius: 0;
+  color: #fff8e0;
+  font-weight: 400;
+  font-size: 11px;
   cursor: pointer;
   text-decoration: none;
-  font-family: 'Syne', sans-serif;
-  letter-spacing: 0.5px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  font-family: var(--pixel-font);
+  letter-spacing: 1.5px;
+  transition: transform 0.05s steps(2), box-shadow 0.05s steps(2);
+  text-transform: uppercase;
+  box-shadow: var(--pixel-shadow);
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
 }
 .btn-stake:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 229, 255, 0.3);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #0a1428;
+}
+.btn-stake:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
 }
 .staking-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 16px;
   margin-bottom: 36px;
 }
 .s-stat {
   text-align: center;
-  padding: 24px 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 22px 14px;
+  background: var(--bg-card-hover);
+  border-radius: 0;
+  border: 2px solid var(--accent-pink);
+  box-shadow: var(--pixel-shadow-sm);
 }
 .s-stat-val {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 24px;
-  background: var(--gradient-pool);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 6px;
+  font-family: var(--mono-font);
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--accent-gold);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+  background: none;
+  -webkit-text-fill-color: var(--accent-gold);
 }
 .s-stat-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  color: var(--text-dim);
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  color: var(--accent-pink);
   text-transform: uppercase;
   letter-spacing: 1.5px;
 }
@@ -1376,25 +1541,27 @@ footer {
   justify-content: center;
   gap: 16px;
   padding: 24px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: var(--bg-card-hover);
+  border-radius: 0;
+  border: 2px solid var(--accent-gold);
   flex-wrap: wrap;
 }
 .flow-step {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 14px;
-  color: var(--text-secondary);
+  font-family: var(--pixel-font);
+  font-size: 9px;
+  color: var(--accent-gold);
+  letter-spacing: 1px;
 }
 .flow-icon {
-  font-size: 20px;
+  font-size: 18px;
 }
 .flow-arrow {
-  color: var(--accent-cyan);
-  font-family: 'Space Mono', monospace;
-  font-size: 18px;
+  color: var(--accent-pink);
+  font-family: var(--pixel-font);
+  font-size: 14px;
 }
 
 @media (max-width: 768px) {
@@ -1406,13 +1573,16 @@ footer {
 .sol-icon {
   width: 100%; height: 100%;
   border-radius: 50%;
-  background: linear-gradient(135deg, #9945ff, #14f195);
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-green));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  font-weight: 800;
+  font-family: var(--pixel-font);
+  font-size: 11px;
+  font-weight: 400;
   color: #fff;
+  border: 2px solid #0a1428;
+  text-shadow: 1px 1px 0 #0a1428;
 }
 
 @keyframes fadeInUp {
@@ -1435,6 +1605,44 @@ footer {
   .pool-table { display: block; overflow-x: auto; }
   footer { flex-direction: column; gap: 24px; text-align: center; }
   .hero-actions { flex-direction: column; align-items: center; }
+  .hero h1 { font-size: clamp(20px, 7vw, 32px); letter-spacing: 1px; }
+  .nav-logo-text { font-size: 11px; }
+  .nav-cta { padding: 9px 14px; font-size: 8px; letter-spacing: 0.5px; }
+  .section-title { font-size: clamp(16px, 4.5vw, 22px); }
+  .cta-section h2 { font-size: clamp(16px, 4.5vw, 24px); }
+  .pixel-font, .stat-value, .pool-stat-value, .staked-value, .s-stat-val { letter-spacing: 0.5px; }
+  .btn-primary, .btn-secondary, .btn-stake { font-size: 9px; padding: 12px 20px; }
+  .pool-pair-info .pair-name { font-size: 9px; }
+  .pool-table thead th { font-size: 7px; padding: 0 12px 12px; }
+  .pool-row td { padding: 14px 12px; }
+  .zap-btn, .pool-action-btn, .copy-ca-btn { font-size: 8px; }
+}
+/* ── Pool Directory Show More ── */
+.pool-row.hidden-row { display: none; }
+.pool-row.hidden-row.shown { display: table-row; }
+.show-more-btn {
+  padding: 12px 24px;
+  background: var(--accent-pink);
+  border: 3px solid #0a1428;
+  border-radius: 0;
+  color: #fff8e0;
+  font-weight: 400;
+  font-size: 10px;
+  cursor: pointer;
+  font-family: var(--pixel-font);
+  letter-spacing: 1.5px;
+  transition: transform 0.05s steps(2), box-shadow 0.05s steps(2);
+  text-transform: uppercase;
+  box-shadow: var(--pixel-shadow);
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+}
+.show-more-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #0a1428;
+}
+.show-more-btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
 }
 </style>
 </head>
@@ -1537,6 +1745,7 @@ footer {
     <div class="marquee-item"><span class="tag">$MARMOT</span> <span class="mc" id="mc-MARMOT-0">—</span></div>
     <div class="marquee-item"><span class="tag">$DEPLOYR</span> <span class="mc" id="mc-DEPLOYR-0">—</span></div>
     <div class="marquee-item"><span class="tag">$APE</span> <span class="mc" id="mc-APE-0">—</span></div>
+    <div class="marquee-item"><span class="tag">$FARTPRINT</span> <span class="mc" id="mc-FARTPRINT-0">—</span></div>
     <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-1">—</span></div>
     <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-1">—</span></div>
     <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-1">—</span></div>
@@ -1550,6 +1759,7 @@ footer {
     <div class="marquee-item"><span class="tag">$MARMOT</span> <span class="mc" id="mc-MARMOT-1">—</span></div>
     <div class="marquee-item"><span class="tag">$DEPLOYR</span> <span class="mc" id="mc-DEPLOYR-1">—</span></div>
     <div class="marquee-item"><span class="tag">$APE</span> <span class="mc" id="mc-APE-1">—</span></div>
+    <div class="marquee-item"><span class="tag">$FARTPRINT</span> <span class="mc" id="mc-FARTPRINT-1">—</span></div>
     <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-2">—</span></div>
     <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-2">—</span></div>
     <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-2">—</span></div>
@@ -1563,6 +1773,7 @@ footer {
     <div class="marquee-item"><span class="tag">$MARMOT</span> <span class="mc" id="mc-MARMOT-2">—</span></div>
     <div class="marquee-item"><span class="tag">$DEPLOYR</span> <span class="mc" id="mc-DEPLOYR-2">—</span></div>
     <div class="marquee-item"><span class="tag">$APE</span> <span class="mc" id="mc-APE-2">—</span></div>
+    <div class="marquee-item"><span class="tag">$FARTPRINT</span> <span class="mc" id="mc-FARTPRINT-2">—</span></div>
     <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-3">—</span></div>
     <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-3">—</span></div>
     <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-3">—</span></div>
@@ -1576,6 +1787,7 @@ footer {
     <div class="marquee-item"><span class="tag">$MARMOT</span> <span class="mc" id="mc-MARMOT-3">—</span></div>
     <div class="marquee-item"><span class="tag">$DEPLOYR</span> <span class="mc" id="mc-DEPLOYR-3">—</span></div>
     <div class="marquee-item"><span class="tag">$APE</span> <span class="mc" id="mc-APE-3">—</span></div>
+    <div class="marquee-item"><span class="tag">$FARTPRINT</span> <span class="mc" id="mc-FARTPRINT-3">—</span></div>
   </div>
 </div>
 
@@ -1853,7 +2065,7 @@ footer {
           </div>
         </td>
       </tr>
-      <tr class="pool-row">
+      <tr class="pool-row hidden-row">
         <td>
           <div class="pool-pair">
             <div class="pool-pair-icons">
@@ -1875,7 +2087,7 @@ footer {
           </div>
         </td>
       </tr>
-      <tr class="pool-row">
+      <tr class="pool-row hidden-row">
         <td>
           <div class="pool-pair">
             <div class="pool-pair-icons">
@@ -1897,8 +2109,34 @@ footer {
           </div>
         </td>
       </tr>
+    <tr class="pool-row hidden-row">
+        <td>
+          <div class="pool-pair">
+            <div class="pool-pair-icons">
+              <div class="icon"><img src="data:image/jpeg;base64,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" alt="FARTPRINT"></div>
+            </div>
+            <div class="pool-pair-info">
+              <div class="pair-name">$FARTPRINT</div>
+            </div>
+          </div>
+        </td>
+        <td class="pool-mcap" id="mcapFARTPRINT">—</td>
+        <td class="pool-tvl" id="pooledFARTPRINT">—</td>
+        <td class="pool-change" id="changeFARTPRINT">—</td>
+        <td>
+          <div class="pool-actions">
+            <button type="button" class="copy-ca-btn" data-token="FARTPRINT" title="Copy FARTPRINT contract address" disabled onclick="copyTokenCA(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+            <a href="https://www.meteora.ag/dammv2/FzuLACSWjwN2iFvJt2CfHwPhCX44zsEryhLboCPLMKm2?referrer=portfolio" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
+            <a href="https://solscan.io/account/FzuLACSWjwN2iFvJt2CfHwPhCX44zsEryhLboCPLMKm2" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
+          </div>
+        </td>
+      </tr>
 </tbody>
   </table>
+
+  <div id="poolDirectoryToggleWrap" style="text-align: center; margin-top: 24px;">
+    <button id="poolDirectoryToggle" class="show-more-btn" type="button" onclick="togglePoolDirectory(this)">Show all 13 ↓</button>
+  </div>
 
   <div style="text-align: center; margin-top: 48px;">
     <p style="color: var(--text-dim); font-family: 'Space Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;">Want your token pooled with $POOL?</p>
@@ -1963,7 +2201,7 @@ footer {
 
 <!-- CTA -->
 <section class="cta-section">
-  <h2>Dive Into the<br><span style="background: var(--gradient-pool); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Pool Party</span></h2>
+  <h2>Dive Into the<br><span style="color: var(--accent-pink); -webkit-text-fill-color: var(--accent-pink); text-shadow: 4px 4px 0 #0a1428;">Pool Party</span></h2>
   <p>Add liquidity, earn fees, and help build the deepest liquidity layer for Printr tokens.</p>
   <div class="cta-buttons">
     
@@ -2053,6 +2291,16 @@ function formatUSDSimple(num) {
 
 fetchTokenPrice();
 setInterval(fetchTokenPrice, 15000);
+
+function togglePoolDirectory(btn) {
+  const rows = document.querySelectorAll('.pool-row.hidden-row');
+  const expanded = btn.classList.toggle('expanded');
+  rows.forEach(r => {
+    if (expanded) r.classList.add('shown');
+    else r.classList.remove('shown');
+  });
+  btn.textContent = expanded ? 'Show less ↑' : 'Show all 13 ↓';
+}
 </script>
 <script>
 const PAIR_ADDRESS = '9da2Awni6BrsEpnxHQtvDHSQf37iZ6t3AMape6zLBDQH';
@@ -2306,6 +2554,7 @@ setInterval(fetchStakingData, 60000);
     { id: '8ctqj9o4cnrd7zro7gtjjrthmbydsbgeg7kmfbkbgok3', el: 'mcapMARMOT' },
     { id: 'esmwvv7gercextd5qfcxaycbjnup236qzvnveru458l5', el: 'mcapDEPLOYR' },
     { id: 'amysyxr3rkdi6moaufp92nherth7hnzz1osxqziwmj9e', el: 'mcapAPE' },
+    { id: 'cptjblrg4zxwstvnmrjv3bfgufcyt94x7rcimccgdryo', el: 'mcapFARTPRINT' },
   ];
 
   function fmtMcap(n) {
@@ -2363,6 +2612,7 @@ setInterval(fetchStakingData, 60000);
     { addr: 'AXEEVoCHLpkTefK7ak81DZGeAd46bWN16LMM5myFdTpH', el: 'pooledMARMOT', name: 'MARMOT', vaultAddr: 'AXEEVoCHLpkTefK7ak81DZGeAd46bWN16LMM5myFdTpH' },
     { addr: '7rxvLcMnoejiqeP3tAZR184N5sus1fVPx4vufg5E3tCQ', el: 'pooledDEPLOYR', name: 'DEPLOYR', vaultAddr: '7rxvLcMnoejiqeP3tAZR184N5sus1fVPx4vufg5E3tCQ' },
     { addr: '6sXhgaRQDbY5MRDHxWsDPDFTWmHjPpedej43nAY1CqhZ', el: 'pooledAPE', name: 'APE', vaultAddr: '6sXhgaRQDbY5MRDHxWsDPDFTWmHjPpedej43nAY1CqhZ' },
+    { addr: 'FzuLACSWjwN2iFvJt2CfHwPhCX44zsEryhLboCPLMKm2', el: 'pooledFARTPRINT', name: 'FARTPRINT', vaultAddr: 'FzuLACSWjwN2iFvJt2CfHwPhCX44zsEryhLboCPLMKm2' },
   ];
 
   function fmtTokens(n) {
@@ -2543,12 +2793,13 @@ const poolData = {
   'MARMOT':   { mcap: 0, pool: 0, change: 0 },
   'DEPLOYR':  { mcap: 0, pool: 0, change: 0 },
   'APE':      { mcap: 0, pool: 0, change: 0 },
+  'FARTPRINT': { mcap: 0, pool: 0, change: 0 },
 };
 
 // Map element IDs to pool keys
-const mcapMap = { 'mcap401k': '401k', 'mcapUP': 'UP', 'mcapBELIEF': 'BELIEF', 'mcapFACAI': 'FACAI', 'mcapMIP': 'MIP', 'mcapFLYWHEEL': 'FLYWHEEL', 'mcapPIC': 'PIC', 'mcapPOSTR': 'POSTR', 'mcapBRRRILLION': 'BRRRILLION', 'mcapMARMOT': 'MARMOT', 'mcapDEPLOYR': 'DEPLOYR', 'mcapAPE': 'APE' };
-const poolMap = { 'pooled401k': '401k', 'pooledUP': 'UP', 'pooledBELIEF': 'BELIEF', 'pooledFACAI': 'FACAI', 'pooledMIP': 'MIP', 'pooledFLYWHEEL': 'FLYWHEEL', 'pooledPIC': 'PIC', 'pooledPOSTR': 'POSTR', 'pooledBRRRILLION': 'BRRRILLION', 'pooledMARMOT': 'MARMOT', 'pooledDEPLOYR': 'DEPLOYR', 'pooledAPE': 'APE' };
-const changeMap = { 'change401k': '401k', 'changeUP': 'UP', 'changeBELIEF': 'BELIEF', 'changeFACAI': 'FACAI', 'changeMIP': 'MIP', 'changeFLYWHEEL': 'FLYWHEEL', 'changePIC': 'PIC', 'changePOSTR': 'POSTR', 'changeBRRRILLION': 'BRRRILLION', 'changeMARMOT': 'MARMOT', 'changeDEPLOYR': 'DEPLOYR', 'changeAPE': 'APE' };
+const mcapMap = { 'mcap401k': '401k', 'mcapUP': 'UP', 'mcapBELIEF': 'BELIEF', 'mcapFACAI': 'FACAI', 'mcapMIP': 'MIP', 'mcapFLYWHEEL': 'FLYWHEEL', 'mcapPIC': 'PIC', 'mcapPOSTR': 'POSTR', 'mcapBRRRILLION': 'BRRRILLION', 'mcapMARMOT': 'MARMOT', 'mcapDEPLOYR': 'DEPLOYR', 'mcapAPE': 'APE', 'mcapFARTPRINT': 'FARTPRINT' };
+const poolMap = { 'pooled401k': '401k', 'pooledUP': 'UP', 'pooledBELIEF': 'BELIEF', 'pooledFACAI': 'FACAI', 'pooledMIP': 'MIP', 'pooledFLYWHEEL': 'FLYWHEEL', 'pooledPIC': 'PIC', 'pooledPOSTR': 'POSTR', 'pooledBRRRILLION': 'BRRRILLION', 'pooledMARMOT': 'MARMOT', 'pooledDEPLOYR': 'DEPLOYR', 'pooledAPE': 'APE', 'pooledFARTPRINT': 'FARTPRINT' };
+const changeMap = { 'change401k': '401k', 'changeUP': 'UP', 'changeBELIEF': 'BELIEF', 'changeFACAI': 'FACAI', 'changeMIP': 'MIP', 'changeFLYWHEEL': 'FLYWHEEL', 'changePIC': 'PIC', 'changePOSTR': 'POSTR', 'changeBRRRILLION': 'BRRRILLION', 'changeMARMOT': 'MARMOT', 'changeDEPLOYR': 'DEPLOYR', 'changeAPE': 'APE', 'changeFARTPRINT': 'FARTPRINT' };
 
 // Parse a percent string like "+12.3%" or "-4.5%" -> signed number
 function parsePercentValue(text) {
@@ -2647,6 +2898,7 @@ function doSort() {
     '$MARMOT': 'MARMOT',
     '$DEPLOYR': 'DEPLOYR',
     '$APE': 'APE',
+    '$FARTPRINT': 'FARTPRINT',
   };
   
   rows.sort((a, b) => {
@@ -2711,6 +2963,7 @@ window.addEventListener('load', () => {
     { key: 'MARMOT', pair: '8ctqj9o4cnrd7zro7gtjjrthmbydsbgeg7kmfbkbgok3' },
     { key: 'DEPLOYR', pair: 'esmwvv7gercextd5qfcxaycbjnup236qzvnveru458l5' },
     { key: 'APE', pair: 'amysyxr3rkdi6moaufp92nherth7hnzz1osxqziwmj9e' },
+    { key: 'FARTPRINT', pair: 'cptjblrg4zxwstvnmrjv3bfgufcyt94x7rcimccgdryo' },
   ];
 
   // Cache resolved mint addresses so we don't repeat work
@@ -2811,7 +3064,7 @@ function copyTokenCA(btn) {
 <script>
 // Aggregate totals: Total $POOL Staked + Total $POOL Pooled (sum across all 6 directory rows)
 (function aggregateTotals() {
-  const pooledIds = ['pooled401k', 'pooledUP', 'pooledBELIEF', 'pooledFACAI', 'pooledMIP', 'pooledFLYWHEEL', 'pooledPIC', 'pooledPOSTR', 'pooledBRRRILLION', 'pooledMARMOT', 'pooledDEPLOYR', 'pooledAPE'];
+  const pooledIds = ['pooled401k', 'pooledUP', 'pooledBELIEF', 'pooledFACAI', 'pooledMIP', 'pooledFLYWHEEL', 'pooledPIC', 'pooledPOSTR', 'pooledBRRRILLION', 'pooledMARMOT', 'pooledDEPLOYR', 'pooledAPE', 'pooledFARTPRINT'];
   const stakedId = 'stakedAmount';
   const totalStakedEl = document.getElementById('totalStakedStat');
   const totalPooledEl = document.getElementById('totalPooledStat');
@@ -2903,6 +3156,7 @@ function copyTokenCA(btn) {
     { key: 'MARMOT',   ticker: '$MARMOT',   pooledId: 'pooledMARMOT' },
     { key: 'DEPLOYR',  ticker: '$DEPLOYR',  pooledId: 'pooledDEPLOYR' },
     { key: 'APE',      ticker: '$APE',      pooledId: 'pooledAPE' },
+    { key: 'FARTPRINT', ticker: '$FARTPRINT', pooledId: 'pooledFARTPRINT' },
   ];
 
   // Parse text like "1.23M $POOL" -> raw number
