@@ -816,8 +816,8 @@ section {
   -webkit-user-select: none;
   text-align: center;
   background:
-    radial-gradient(circle at 35% 30%, rgba(245,200,66,0.18) 0%, transparent 35%),
-    var(--bg-primary);
+    radial-gradient(circle at 35% 30%, rgba(245,200,66,0.20) 0%, transparent 38%),
+    radial-gradient(circle at 50% 50%, var(--bg-card-hover) 0%, var(--bg-card) 60%, var(--bg-primary) 100%);
   border: 3px solid var(--accent-gold);
   box-shadow:
     2px 2px 0 rgba(245,200,66,0.35),
@@ -2642,19 +2642,25 @@ setInterval(fetchStakingData, 60000);
   }
 
   async function update() {
-    for (const p of pairs) {
-      try {
-        const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/' + p.id);
-        const data = await res.json();
-        const pair = data.pairs ? data.pairs[0] : data.pair;
-        if (pair) {
-          const mcap = pair.marketCap || pair.fdv || 0;
-          const el = document.getElementById(p.el);
-          if (el) el.textContent = fmtMcap(mcap);
-        }
-      } catch(e) {
+    // DexScreener accepts up to ~30 comma-separated pair IDs per request — fetch all at once.
+    try {
+      const ids = pairs.map(p => p.id).join(',');
+      const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/' + ids);
+      const data = await res.json();
+      const list = data.pairs || (data.pair ? [data.pair] : []);
+      // Build lookup keyed by pair address (case-insensitive).
+      const byAddr = {};
+      for (const pr of list) {
+        if (pr && pr.pairAddress) byAddr[pr.pairAddress.toLowerCase()] = pr;
       }
-    }
+      for (const p of pairs) {
+        const pair = byAddr[p.id.toLowerCase()];
+        if (!pair) continue;
+        const mcap = pair.marketCap || pair.fdv || 0;
+        const el = document.getElementById(p.el);
+        if (el) el.textContent = fmtMcap(mcap);
+      }
+    } catch(e) {}
   }
 
   await update();
@@ -2817,8 +2823,7 @@ setInterval(fetchStakingData, 60000);
             }
           } catch(e) {}
           
-          // Small delay to avoid rate limits
-          await new Promise(r => setTimeout(r, 100));
+          // (rate-limit delay removed — outer chunking already paces requests)
         }
       }
 
@@ -2838,18 +2843,20 @@ setInterval(fetchStakingData, 60000);
     } catch(e) { pool.vaultAddr = null; }
   }
 
-  // Initial fetch - full scan
-  for (const pool of pools) {
-    await fetchOne(pool);
-    await new Promise(r => setTimeout(r, 300));
+  // Run an array of jobs in parallel chunks so we don't hammer a single RPC.
+  async function runChunked(items, fn, chunkSize) {
+    for (let i = 0; i < items.length; i += chunkSize) {
+      const slice = items.slice(i, i + chunkSize);
+      await Promise.all(slice.map(fn));
+    }
   }
 
-  // Subsequent fetches - use cached vaults when available
-  setInterval(async () => {
-    for (const pool of pools) {
-      await quickFetch(pool);
-      await new Promise(r => setTimeout(r, 300));
-    }
+  // Initial fetch - parallel chunks of 4
+  await runChunked(pools, fetchOne, 4);
+
+  // Subsequent fetches - use cached vaults when available, also parallel
+  setInterval(() => {
+    runChunked(pools, quickFetch, 4);
   }, 60000);
 })();
 </script>
@@ -3024,7 +3031,7 @@ window.addEventListener('load', () => {
   currentSort = 'pool';
   sortDir = 'desc';
   
-  // Start observing after a delay to let data load
+  // Data loads in parallel now, so we can start observing almost immediately.
   setTimeout(() => {
     observeValues();
     // Also do an initial read
@@ -3045,7 +3052,7 @@ window.addEventListener('load', () => {
     // Update active header
     const activeHeader = document.querySelector('[data-sort="pool"]');
     if (activeHeader) activeHeader.classList.add('active');
-  }, 5000);
+  }, 1000);
 });
 </script>
 <script>
@@ -3082,55 +3089,61 @@ window.addEventListener('load', () => {
     });
   }
 
-  async function update() {
-    for (const coin of coins) {
-      try {
-        const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/' + coin.pair);
-        const data = await res.json();
-        const pair = data.pairs ? data.pairs[0] : data.pair;
-        if (pair) {
-          const change = pair.priceChange?.h24 || 0;
-          const text = (change >= 0 ? '+' : '') + change.toFixed(1) + '%';
-          const color = change >= 0 ? '#00ff88' : '#ff4466';
-          
-          // Update all instances in the marquee
-          for (let i = 0; i < 4; i++) {
-            const el = document.getElementById('mc-' + coin.key + '-' + i);
-            if (el) {
-              el.textContent = text;
-              el.style.color = color;
-            }
-          }
+  function applyCoin(coin, pair) {
+    if (!pair) return;
+    const change = pair.priceChange?.h24 || 0;
+    const text = (change >= 0 ? '+' : '') + change.toFixed(1) + '%';
+    const color = change >= 0 ? '#00ff88' : '#ff4466';
 
-          // Update the per-row 24h % cell (skip $POOL — it's not in the table)
-          if (coin.key !== 'POOL') {
-            // ID suffix matches the existing pooledXXX convention (lowercase only for 401k)
-            const idKey = coin.key === '401K' ? '401k' : coin.key;
-            const changeEl = document.getElementById('change' + idKey);
-            if (changeEl) {
-              changeEl.textContent = text;
-              changeEl.classList.remove('up', 'down');
-              changeEl.classList.add(change >= 0 ? 'up' : 'down');
-            }
-          }
-
-          // Resolve and cache the token mint address (the side that isn't $POOL)
-          if (!mintCache[coin.key] && coin.key !== 'POOL') {
-            const baseAddr = pair.baseToken?.address;
-            const quoteAddr = pair.quoteToken?.address;
-            let mint = null;
-            if (baseAddr && baseAddr !== POOL_MINT) mint = baseAddr;
-            else if (quoteAddr && quoteAddr !== POOL_MINT) mint = quoteAddr;
-            if (mint) {
-              mintCache[coin.key] = mint;
-              applyMintToButtons(coin.key, mint);
-            }
-          }
-        }
-      } catch(e) {
+    // Update all instances in the marquee
+    for (let i = 0; i < 4; i++) {
+      const el = document.getElementById('mc-' + coin.key + '-' + i);
+      if (el) {
+        el.textContent = text;
+        el.style.color = color;
       }
-      await new Promise(r => setTimeout(r, 200));
     }
+
+    // Update the per-row 24h % cell (skip $POOL — it's not in the table)
+    if (coin.key !== 'POOL') {
+      const idKey = coin.key === '401K' ? '401k' : coin.key;
+      const changeEl = document.getElementById('change' + idKey);
+      if (changeEl) {
+        changeEl.textContent = text;
+        changeEl.classList.remove('up', 'down');
+        changeEl.classList.add(change >= 0 ? 'up' : 'down');
+      }
+    }
+
+    // Resolve and cache the token mint address (the side that isn't $POOL)
+    if (!mintCache[coin.key] && coin.key !== 'POOL') {
+      const baseAddr = pair.baseToken?.address;
+      const quoteAddr = pair.quoteToken?.address;
+      let mint = null;
+      if (baseAddr && baseAddr !== POOL_MINT) mint = baseAddr;
+      else if (quoteAddr && quoteAddr !== POOL_MINT) mint = quoteAddr;
+      if (mint) {
+        mintCache[coin.key] = mint;
+        applyMintToButtons(coin.key, mint);
+      }
+    }
+  }
+
+  async function update() {
+    // Fetch all coins in a single batched DexScreener request instead of 17 serial calls.
+    try {
+      const ids = coins.map(c => c.pair).join(',');
+      const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/' + ids);
+      const data = await res.json();
+      const list = data.pairs || (data.pair ? [data.pair] : []);
+      const byAddr = {};
+      for (const pr of list) {
+        if (pr && pr.pairAddress) byAddr[pr.pairAddress.toLowerCase()] = pr;
+      }
+      for (const coin of coins) {
+        applyCoin(coin, byAddr[coin.pair.toLowerCase()]);
+      }
+    } catch(e) {}
   }
 
 
@@ -3404,7 +3417,7 @@ function copyTokenCA(btn) {
       // A horizontal chord across the bubble at vertical center = 2r, but text
       // sits above/below center so we use a slightly narrower chord to be safe,
       // and reserve ~10% for inner padding.
-      const innerPad = 0.80;
+      const innerPad = 0.74;
       // The chord at the text's vertical offset from center is 2 × √(r² − dy²).
       // For the ticker, the text baseline sits roughly r*0.15 from center when
       // the icon is visible, more when it isn't. Use a conservative estimate.
@@ -3414,13 +3427,15 @@ function copyTokenCA(btn) {
       const valueChord  = 2 * Math.sqrt(Math.max(0.01, r * r - valueDy  * valueDy))  * innerPad;
 
       // Cap by area-proportional sizing so big bubbles don't get absurdly big text
-      const tickerCap = r * 0.40;
+      const tickerCap = r * 0.34;
       const valueCap  = r * 0.26;
 
-      // Allow text to shrink as small as the bubble actually needs — clamping at
-      // a pixel floor was causing long tickers like $BILLI to overflow on small bubbles.
-      const tickerSize = Math.max(6, Math.min(tickerCap, fitFontSize(b.ticker, tickerChord, '800', 'Syne, sans-serif')));
-      const valueSize  = Math.max(6, Math.min(valueCap,  fitFontSize(valueText, valueChord, '700', '"Space Mono", monospace')));
+      // Allow text to shrink as small as the bubble actually needs.
+      // IMPORTANT: measure with the SAME font that's rendered, otherwise wide
+      // pixel-font glyphs ('Press Start 2P') get under-measured by Syne and
+      // overflow on small bubbles like $BILLI.
+      const tickerSize = Math.max(6, Math.min(tickerCap, fitFontSize(b.ticker, tickerChord, '400', '"Press Start 2P", monospace')));
+      const valueSize  = Math.max(6, Math.min(valueCap,  fitFontSize(valueText, valueChord, '700', 'VT323, monospace')));
 
       b.tickerEl.style.fontSize = tickerSize + 'px';
       b.valueEl.style.fontSize  = valueSize + 'px';
