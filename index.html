@@ -1409,6 +1409,80 @@ footer {
   background: none;
   -webkit-text-fill-color: var(--accent-gold);
 }
+.staking-rewards {
+  margin-top: 24px;
+  padding: 24px 28px;
+  background: rgba(20, 43, 74, 0.6);
+  border: 2px solid var(--accent-pink);
+  box-shadow: var(--pixel-shadow-sm);
+}
+.staking-rewards-label {
+  font-family: var(--pixel-font);
+  font-size: 9px;
+  color: var(--accent-pink);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.rewards-list {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 520px;
+}
+.rewards-list li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(245, 200, 66, 0.25);
+}
+.rewards-list li:last-child {
+  border-bottom: none;
+}
+.rewards-amount {
+  font-family: var(--mono-font);
+  font-size: 20px;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+.rewards-usd {
+  font-family: var(--mono-font);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--accent-green);
+  letter-spacing: 0.3px;
+}
+.rewards-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 2px solid rgba(245, 200, 66, 0.4);
+}
+.rewards-total-label {
+  font-family: var(--pixel-font);
+  font-size: 10px;
+  color: var(--accent-pink);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.rewards-total-value {
+  font-family: var(--mono-font);
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--accent-gold);
+  letter-spacing: 0.5px;
+}
+@media (max-width: 480px) {
+  .rewards-list li { flex-wrap: wrap; gap: 4px; }
+  .rewards-amount, .rewards-usd { font-size: 15px; }
+  .rewards-total-value { font-size: 22px; }
+}
 @media (max-width: 480px) {
   .pool-stats { grid-template-columns: 1fr; }
   .pool-stat-value { font-size: 22px; }
@@ -2310,6 +2384,23 @@ footer {
       <div class="staked-value" id="stakedAmount">—</div>
       <div class="staked-usd" id="stakedUsd"></div>
     </div>
+    <div class="staking-rewards">
+      <div class="staking-rewards-label">Value Paid to Stakers</div>
+      <ul class="rewards-list">
+        <li>
+          <span class="rewards-amount" id="rewardsSolAmt">5.96 SOL</span>
+          <span class="rewards-usd" id="rewardsSolUsd">—</span>
+        </li>
+        <li>
+          <span class="rewards-amount" id="rewardsFartAmt">100,000,000 FARTPRINT</span>
+          <span class="rewards-usd" id="rewardsFartUsd">—</span>
+        </li>
+      </ul>
+      <div class="rewards-total">
+        <span class="rewards-total-label">Total</span>
+        <span class="rewards-total-value" id="rewardsTotalUsd">—</span>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -3184,6 +3275,42 @@ window.addEventListener('load', () => {
       for (const coin of coins) {
         applyCoin(coin, byAddr[coin.pair.toLowerCase()]);
       }
+
+      // ── Rewards-paid-to-stakers calculation ─────────────────────────
+      // SOL/USD: derived from any pair quoted in SOL (priceUsd / priceNative).
+      let solUsd = 0;
+      for (const pr of list) {
+        const native = parseFloat(pr?.priceNative);
+        const usd = parseFloat(pr?.priceUsd);
+        if (native > 0 && usd > 0 && (pr.quoteToken?.symbol || '').toUpperCase() === 'SOL') {
+          solUsd = usd / native;
+          break;
+        }
+      }
+      // FARTPRINT market cap → 10% goes to the airdrop (100M of ~1B supply).
+      const fartPair = byAddr['cptjblrg4zxwstvnmrjv3bfgufcyt94x7rcimccgdryo'];
+      const fartMcap = (fartPair?.marketCap || fartPair?.fdv || 0);
+
+      const SOL_AMOUNT = 5.96;
+      const solValue = SOL_AMOUNT * solUsd;
+      const fartValue = fartMcap * 0.10;
+      const totalValue = solValue + fartValue;
+
+      const fmtUsd = (n) => {
+        if (!n || n <= 0) return '—';
+        if (n >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'B';
+        if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+        if (n >= 1e3) return '$' + (n / 1e3).toFixed(1) + 'K';
+        if (n >= 1) return '$' + n.toFixed(2);
+        return '$' + n.toFixed(4);
+      };
+
+      const solUsdEl = document.getElementById('rewardsSolUsd');
+      const fartUsdEl = document.getElementById('rewardsFartUsd');
+      const totalEl = document.getElementById('rewardsTotalUsd');
+      if (solUsdEl) solUsdEl.textContent = solValue > 0 ? '≈ ' + fmtUsd(solValue) : '—';
+      if (fartUsdEl) fartUsdEl.textContent = fartValue > 0 ? '≈ ' + fmtUsd(fartValue) : '—';
+      if (totalEl) totalEl.textContent = totalValue > 0 ? fmtUsd(totalValue) : '—';
     } catch(e) {}
   }
 
