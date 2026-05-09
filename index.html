@@ -286,8 +286,9 @@ nav {
   image-rendering: pixelated;
   border: 4px solid var(--accent-gold);
   box-shadow:
-    0 0 0 4px #0a1428,
-    8px 8px 0 rgba(212, 152, 32, 0.4);
+    0 0 0 2px rgba(212, 152, 32, 0.55),
+    0 0 28px rgba(245, 200, 66, 0.45),
+    8px 8px 24px rgba(212, 152, 32, 0.25);
 }
 .hero-coin img {
   width: 100%; height: 100%;
@@ -815,12 +816,12 @@ section {
   -webkit-user-select: none;
   text-align: center;
   background:
-    radial-gradient(circle at 35% 30%, rgba(255,255,255,0.35) 0%, transparent 30%),
-    radial-gradient(circle at 50% 50%, var(--accent-gold) 0%, var(--accent-gold-dark) 100%);
-  border: 3px solid #0a1428;
+    radial-gradient(circle at 35% 30%, rgba(245,200,66,0.18) 0%, transparent 35%),
+    var(--bg-primary);
+  border: 3px solid var(--accent-gold);
   box-shadow:
-    var(--pixel-shadow-sm),
-    inset 0 0 0 2px rgba(255,255,255,0.2);
+    2px 2px 0 rgba(245,200,66,0.35),
+    inset 0 0 0 2px rgba(245,200,66,0.18);
   transition: transform 0.05s linear;
   will-change: transform;
   overflow: hidden;
@@ -842,15 +843,15 @@ section {
 .bubble:hover {
   transform: translate(-1px, -1px);
   box-shadow:
-    3px 3px 0 #0a1428,
-    inset 0 0 0 2px rgba(255,255,255,0.3);
+    3px 3px 0 rgba(245,200,66,0.5),
+    inset 0 0 0 2px rgba(245,200,66,0.3);
 }
 .bubble.dragging {
   cursor: grabbing;
   z-index: 10;
   box-shadow:
-    4px 4px 0 #0a1428,
-    inset 0 0 0 2px rgba(255,255,255,0.4);
+    4px 4px 0 rgba(245,200,66,0.6),
+    inset 0 0 0 2px rgba(245,200,66,0.4);
 }
 .bubble-icon {
   width: 42%;
@@ -861,24 +862,24 @@ section {
   pointer-events: none;
   position: relative;
   z-index: 4;
-  border: 2px solid #0a1428;
+  border: 2px solid var(--accent-gold);
   image-rendering: pixelated;
 }
 .bubble-ticker {
   font-family: var(--pixel-font);
   font-weight: 400;
-  color: #0a1428;
+  color: var(--accent-gold);
   letter-spacing: 1px;
   pointer-events: none;
   line-height: 1.2;
   white-space: nowrap;
   position: relative;
   z-index: 4;
-  text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
+  text-shadow: 1px 1px 0 #0a1428, 2px 2px 0 rgba(0,0,0,0.4);
 }
 .bubble-value {
   font-family: var(--mono-font);
-  color: #0a1428;
+  color: var(--text-primary);
   font-weight: 700;
   margin-top: 4px;
   pointer-events: none;
@@ -887,6 +888,7 @@ section {
   position: relative;
   z-index: 4;
   font-size: 1.1em;
+  text-shadow: 1px 1px 0 #0a1428;
 }
 @media (max-width: 768px) {
   .bubble-stage { height: 460px; }
@@ -1218,14 +1220,14 @@ footer {
   /* Give the contract address room to fit on a single line on mobile */
   .ca-box { padding: 8px 10px; gap: 6px; max-width: calc(100vw - 24px); }
   .ca-text {
-    font-size: 10px;
+    font-size: 11px;
     word-break: normal;
     overflow-wrap: normal;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
-    letter-spacing: -0.2px;
+    letter-spacing: 0;
   }
   .ca-copy { font-size: 10px; }
   .ca-copy svg { width: 12px; height: 12px; }
@@ -1233,7 +1235,7 @@ footer {
   nav { padding: 14px 20px; }
 }
 @media (max-width: 380px) {
-  .ca-text { font-size: 9px; letter-spacing: -0.3px; }
+  .ca-text { font-size: 10px; letter-spacing: 0; }
   .ca-box { padding: 8px; gap: 4px; }
   .ca-copy { font-size: 9px; }
 }
@@ -1312,11 +1314,13 @@ footer {
 }
 .ca-text {
   font-family: var(--mono-font);
-  font-size: 16px;
-  color: var(--text-secondary);
-  word-break: break-all;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: 0;
   user-select: all;
-  letter-spacing: 0.5px;
+  word-break: break-all;
+  line-height: 1.5;
 }
 .ca-copy {
   display: inline-flex;
@@ -1746,6 +1750,9 @@ footer {
     <div class="marquee-item"><span class="tag">$DEPLOYR</span> <span class="mc" id="mc-DEPLOYR-0">—</span></div>
     <div class="marquee-item"><span class="tag">$APE</span> <span class="mc" id="mc-APE-0">—</span></div>
     <div class="marquee-item"><span class="tag">$FARTPRINT</span> <span class="mc" id="mc-FARTPRINT-0">—</span></div>
+    <div class="marquee-item"><span class="tag">$BELEAF</span> <span class="mc" id="mc-BELEAF-0">—</span></div>
+    <div class="marquee-item"><span class="tag">$GAMBLR</span> <span class="mc" id="mc-GAMBLR-0">—</span></div>
+    <div class="marquee-item"><span class="tag">$BILLI</span> <span class="mc" id="mc-BILLI-0">—</span></div>
     <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-1">—</span></div>
     <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-1">—</span></div>
     <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-1">—</span></div>
@@ -1760,6 +1767,9 @@ footer {
     <div class="marquee-item"><span class="tag">$DEPLOYR</span> <span class="mc" id="mc-DEPLOYR-1">—</span></div>
     <div class="marquee-item"><span class="tag">$APE</span> <span class="mc" id="mc-APE-1">—</span></div>
     <div class="marquee-item"><span class="tag">$FARTPRINT</span> <span class="mc" id="mc-FARTPRINT-1">—</span></div>
+    <div class="marquee-item"><span class="tag">$BELEAF</span> <span class="mc" id="mc-BELEAF-1">—</span></div>
+    <div class="marquee-item"><span class="tag">$GAMBLR</span> <span class="mc" id="mc-GAMBLR-1">—</span></div>
+    <div class="marquee-item"><span class="tag">$BILLI</span> <span class="mc" id="mc-BILLI-1">—</span></div>
     <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-2">—</span></div>
     <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-2">—</span></div>
     <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-2">—</span></div>
@@ -1774,6 +1784,9 @@ footer {
     <div class="marquee-item"><span class="tag">$DEPLOYR</span> <span class="mc" id="mc-DEPLOYR-2">—</span></div>
     <div class="marquee-item"><span class="tag">$APE</span> <span class="mc" id="mc-APE-2">—</span></div>
     <div class="marquee-item"><span class="tag">$FARTPRINT</span> <span class="mc" id="mc-FARTPRINT-2">—</span></div>
+    <div class="marquee-item"><span class="tag">$BELEAF</span> <span class="mc" id="mc-BELEAF-2">—</span></div>
+    <div class="marquee-item"><span class="tag">$GAMBLR</span> <span class="mc" id="mc-GAMBLR-2">—</span></div>
+    <div class="marquee-item"><span class="tag">$BILLI</span> <span class="mc" id="mc-BILLI-2">—</span></div>
     <div class="marquee-item"><span class="tag">$POOL</span> <span class="mc" id="mc-POOL-3">—</span></div>
     <div class="marquee-item"><span class="tag">$401K</span> <span class="mc" id="mc-401K-3">—</span></div>
     <div class="marquee-item"><span class="tag">$UP</span> <span class="mc" id="mc-UP-3">—</span></div>
@@ -1788,16 +1801,10 @@ footer {
     <div class="marquee-item"><span class="tag">$DEPLOYR</span> <span class="mc" id="mc-DEPLOYR-3">—</span></div>
     <div class="marquee-item"><span class="tag">$APE</span> <span class="mc" id="mc-APE-3">—</span></div>
     <div class="marquee-item"><span class="tag">$FARTPRINT</span> <span class="mc" id="mc-FARTPRINT-3">—</span></div>
+    <div class="marquee-item"><span class="tag">$BELEAF</span> <span class="mc" id="mc-BELEAF-3">—</span></div>
+    <div class="marquee-item"><span class="tag">$GAMBLR</span> <span class="mc" id="mc-GAMBLR-3">—</span></div>
+    <div class="marquee-item"><span class="tag">$BILLI</span> <span class="mc" id="mc-BILLI-3">—</span></div>
   </div>
-</div>
-
-<!-- STATS -->
-<div class="stats-bar">
-  <div class="stat-item">
-    <div class="stat-value" id="activePoolsStat">—</div>
-    <div class="stat-label">Active Pools</div>
-  </div>
-  
 </div>
 
 <!-- HOW IT WORKS -->
@@ -2131,11 +2138,77 @@ footer {
           </div>
         </td>
       </tr>
+    <tr class="pool-row hidden-row">
+        <td>
+          <div class="pool-pair">
+            <div class="pool-pair-icons">
+              <div class="icon"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNjZmQ5N2EiLz4KPHBhdGggZD0iTTUwIDggVjM2IiBzdHJva2U9IiM1YjZlMjYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTUwIDE4IEM0NCAxNCA0MCAxMCAzNiA3IiBzdHJva2U9IiM1YjZlMjYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTUwIDI0IEM1NyAxOSA2MiAxMyA2NCA5IiBzdHJva2U9IiM1YjZlMjYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTUwIDMwIEM0NSAyNyA0MSAyMyAzOSAxOSIgc3Ryb2tlPSIjNWI2ZTI2IiBzdHJva2Utd2lkdGg9IjMuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIi8+CjxwYXRoIGQ9Ik0yNyA0MCBxNSAtNCAxMSAwIiBzdHJva2U9IiMwYTBhMGEiIHN0cm9rZS13aWR0aD0iMy41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTYyIDQwIHE1IC00IDExIDAiIHN0cm9rZT0iIzBhMGEwYSIgc3Ryb2tlLXdpZHRoPSIzLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSIvPgo8ZWxsaXBzZSBjeD0iMzMiIGN5PSI2MCIgcng9IjkuNSIgcnk9IjEyIiBmaWxsPSIjMGEwYTBhIi8+CjxjaXJjbGUgY3g9IjMwIiBjeT0iNTUiIHI9IjMuMiIgZmlsbD0iI2ZmZmZmZiIvPgo8Y2lyY2xlIGN4PSIzNi41IiBjeT0iNjUiIHI9IjEuOCIgZmlsbD0iI2ZmZmZmZiIvPgo8ZWxsaXBzZSBjeD0iNjciIGN5PSI2MCIgcng9IjkuNSIgcnk9IjEyIiBmaWxsPSIjMGEwYTBhIi8+CjxjaXJjbGUgY3g9IjY0IiBjeT0iNTUiIHI9IjMuMiIgZmlsbD0iI2ZmZmZmZiIvPgo8Y2lyY2xlIGN4PSI3MC41IiBjeT0iNjUiIHI9IjEuOCIgZmlsbD0iI2ZmZmZmZiIvPgo8ZWxsaXBzZSBjeD0iMjAiIGN5PSI3NiIgcng9IjgiIHJ5PSI0LjIiIGZpbGw9IiNjZjhiNzMiLz4KPGxpbmUgeDE9IjE3IiB5MT0iNzQuNSIgeDI9IjE5LjUiIHkyPSI3NyIgc3Ryb2tlPSIjM2IxYzE0IiBzdHJva2Utd2lkdGg9IjEuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjxsaW5lIHgxPSIyMiIgeTE9Ijc0IiB4Mj0iMjQuNSIgeTI9Ijc2LjUiIHN0cm9rZT0iIzNiMWMxNCIgc3Ryb2tlLXdpZHRoPSIxLjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8ZWxsaXBzZSBjeD0iODAiIGN5PSI3NiIgcng9IjgiIHJ5PSI0LjIiIGZpbGw9IiNjZjhiNzMiLz4KPGxpbmUgeDE9Ijc2LjUiIHkxPSI3NC41IiB4Mj0iNzkiIHkyPSI3NyIgc3Ryb2tlPSIjM2IxYzE0IiBzdHJva2Utd2lkdGg9IjEuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjxsaW5lIHgxPSI4MS41IiB5MT0iNzQiIHgyPSI4NCIgeTI9Ijc2LjUiIHN0cm9rZT0iIzNiMWMxNCIgc3Ryb2tlLXdpZHRoPSIxLjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8cGF0aCBkPSJNNDQgNzggcTMgNCA2IDAgcTMgNCA2IDAiIHN0cm9rZT0iIzBhMGEwYSIgc3Ryb2tlLXdpZHRoPSIyLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4=" alt="BELEAF"></div>
+            </div>
+            <div class="pool-pair-info">
+              <div class="pair-name">$BELEAF</div>
+            </div>
+          </div>
+        </td>
+        <td class="pool-mcap" id="mcapBELEAF">—</td>
+        <td class="pool-tvl" id="pooledBELEAF">—</td>
+        <td class="pool-change" id="changeBELEAF">—</td>
+        <td>
+          <div class="pool-actions">
+            <button type="button" class="copy-ca-btn" data-token="BELEAF" title="Copy BELEAF contract address" disabled onclick="copyTokenCA(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+            <a href="https://www.meteora.ag/dammv2/F1SSSD9uabGcMqEeZ97SWLxRxz5rHrz54VwARuDttPvg?referrer=portfolio" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
+            <a href="https://solscan.io/account/F1SSSD9uabGcMqEeZ97SWLxRxz5rHrz54VwARuDttPvg" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
+          </div>
+        </td>
+      </tr>
+    <tr class="pool-row hidden-row">
+        <td>
+          <div class="pool-pair">
+            <div class="pool-pair-icons">
+              <div class="icon"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiMwYTBhMTQiLz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iYXVyb3JhIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIwJSI+CjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZjdhNGQiIHN0b3Atb3BhY2l0eT0iMC41NSIvPgo8c3RvcCBvZmZzZXQ9IjUwJSIgc3RvcC1jb2xvcj0iI2Q0NGFkOCIgc3RvcC1vcGFjaXR5PSIwLjciLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZmY0NWE4IiBzdG9wLW9wYWNpdHk9IjAuNDUiLz4KPC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8cGF0aCBkPSJNMCA2IFEyNSAyMiA1NSAxNCBRODAgOCAxMDAgMTggTDEwMCAwIEwwIDAgWiIgZmlsbD0idXJsKCNhdXJvcmEpIi8+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDUwIDU0KSBza2V3WCgtMTIpIj4KPHRleHQgeD0iMCIgeT0iMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkltcGFjdCwgJ0FyaWFsIEJsYWNrJywgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zaXplPSIzNCIgZmlsbD0iIzBhMGExNCIgc3Ryb2tlPSIjMGEwYTE0IiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHBhaW50LW9yZGVyPSJzdHJva2UiPmdhbWJscjwvdGV4dD4KPHRleHQgeD0iMCIgeT0iMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkltcGFjdCwgJ0FyaWFsIEJsYWNrJywgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zaXplPSIzNCIgZmlsbD0iI2ZmZmZmZiI+Z2FtYmxyPC90ZXh0Pgo8L2c+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDUwIDY0KSBza2V3WCgtMTIpIj4KPHJlY3QgeD0iLTI2IiB5PSIwIiB3aWR0aD0iMTMiIGhlaWdodD0iNCIgZmlsbD0iIzNmYzlmZiIvPgo8cmVjdCB4PSItMTMiIHk9IjAiIHdpZHRoPSIxMyIgaGVpZ2h0PSI0IiBmaWxsPSIjZmY0NWE4Ii8+CjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMyIgaGVpZ2h0PSI0IiBmaWxsPSIjZmY4YTNhIi8+CjxyZWN0IHg9IjEzIiB5PSIwIiB3aWR0aD0iMTMiIGhlaWdodD0iNCIgZmlsbD0iI2Y1Yzg0MiIvPgo8L2c+Cjwvc3ZnPg==" alt="GAMBLR"></div>
+            </div>
+            <div class="pool-pair-info">
+              <div class="pair-name">$GAMBLR</div>
+            </div>
+          </div>
+        </td>
+        <td class="pool-mcap" id="mcapGAMBLR">—</td>
+        <td class="pool-tvl" id="pooledGAMBLR">—</td>
+        <td class="pool-change" id="changeGAMBLR">—</td>
+        <td>
+          <div class="pool-actions">
+            <button type="button" class="copy-ca-btn" data-token="GAMBLR" title="Copy GAMBLR contract address" disabled onclick="copyTokenCA(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+            <a href="https://www.meteora.ag/dammv2/7xPTRtoUG3pqFawwDzZuTrkzZ2hZAkg11DWNzYDsdurf?referrer=portfolio" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
+            <a href="https://solscan.io/account/7xPTRtoUG3pqFawwDzZuTrkzZ2hZAkg11DWNzYDsdurf" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
+          </div>
+        </td>
+      </tr>
+    <tr class="pool-row hidden-row">
+        <td>
+          <div class="pool-pair">
+            <div class="pool-pair-icons">
+              <div class="icon"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNlNzUyMWEiLz4KPGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDIiIGZpbGw9IiMwYTA3MDciLz4KPGRlZnM+CjxyYWRpYWxHcmFkaWVudCBpZD0iY2F0R3JhZCIgY3g9IjUwJSIgY3k9IjU1JSIgcj0iNTUlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmYjA0YSIvPgo8c3RvcCBvZmZzZXQ9IjYwJSIgc3RvcC1jb2xvcj0iI2U3NTIxYSIvPgo8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM3YTI1MDkiLz4KPC9yYWRpYWxHcmFkaWVudD4KPC9kZWZzPgo8cGF0aCBkPSJNMjggMzggTDMzIDIyIEw0MiAzNiBaIiBmaWxsPSJ1cmwoI2NhdEdyYWQpIi8+CjxwYXRoIGQ9Ik03MiAzOCBMNjcgMjIgTDU4IDM2IFoiIGZpbGw9InVybCgjY2F0R3JhZCkiLz4KPHBhdGggZD0iTTMwIDI4IEwzNCAzMiBMMzYgMjcgWiIgZmlsbD0iIzNhMTMwNCIvPgo8cGF0aCBkPSJNNzAgMjggTDY2IDMyIEw2NCAyNyBaIiBmaWxsPSIjM2ExMzA0Ii8+CjxlbGxpcHNlIGN4PSI1MCIgY3k9IjU2IiByeD0iMjQiIHJ5PSIyMiIgZmlsbD0idXJsKCNjYXRHcmFkKSIvPgo8cGF0aCBkPSJNNDAgMzggcTIgNiA0IDAgTTQ0IDM2IHEyIDcgNCAwIE01MiAzNiBxMiA3IDQgMCBNNTYgMzggcTIgNiA0IDAiIHN0cm9rZT0iIzdhMjUwOSIgc3Ryb2tlLXdpZHRoPSIxLjQiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8ZWxsaXBzZSBjeD0iNDIiIGN5PSI1MCIgcng9IjQiIHJ5PSIzLjUiIGZpbGw9IiNmNWM4NDIiLz4KPGVsbGlwc2UgY3g9IjU4IiBjeT0iNTAiIHJ4PSI0IiByeT0iMy41IiBmaWxsPSIjZjVjODQyIi8+CjxlbGxpcHNlIGN4PSI0MiIgY3k9IjUwIiByeD0iMS40IiByeT0iMyIgZmlsbD0iIzBhMDcwNyIvPgo8ZWxsaXBzZSBjeD0iNTgiIGN5PSI1MCIgcng9IjEuNCIgcnk9IjMiIGZpbGw9IiMwYTA3MDciLz4KPHBhdGggZD0iTTQ2IDYwIFE1MCA2NCA1NCA2MCBMNTIgNjIgTDUwIDYzIEw0OCA2MiBaIiBmaWxsPSIjYzQ0MDE2Ii8+CjxwYXRoIGQ9Ik01MCA2MyBMNTAgNjciIHN0cm9rZT0iIzNhMTMwNCIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPHBhdGggZD0iTTUwIDY3IHEtMyAxIC01IDAgTTUwIDY3IHEzIDEgNSAwIiBzdHJva2U9IiMzYTEzMDQiIHN0cm9rZS13aWR0aD0iMS4yIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPHBhdGggZD0iTTQwIDY0IEwyOCA2MiBNNDAgNjYgTDI4IDY3IE02MCA2NCBMNzIgNjIgTTYwIDY2IEw3MiA2NyIgc3Ryb2tlPSIjZmZkOWEwIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIwLjciLz4KPC9zdmc+" alt="BILLI"></div>
+            </div>
+            <div class="pool-pair-info">
+              <div class="pair-name">$BILLI</div>
+            </div>
+          </div>
+        </td>
+        <td class="pool-mcap" id="mcapBILLI">—</td>
+        <td class="pool-tvl" id="pooledBILLI">—</td>
+        <td class="pool-change" id="changeBILLI">—</td>
+        <td>
+          <div class="pool-actions">
+            <button type="button" class="copy-ca-btn" data-token="BILLI" title="Copy BILLI contract address" disabled onclick="copyTokenCA(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+            <a href="https://www.meteora.ag/dammv2/5pMuYK89UNY7RE3bVG69KiXX8BDftiHTjEyfLA4H3ssm?referrer=portfolio" target="_blank" class="zap-btn" title="Quick deposit on Meteora"><span class="zap-icon">⚡</span>0.1</a>
+            <a href="https://solscan.io/account/5pMuYK89UNY7RE3bVG69KiXX8BDftiHTjEyfLA4H3ssm" target="_blank" class="pool-action-btn solscan-btn" title="View on Solscan"><svg class="solscan-icon" width="16" height="16" viewBox="0 0 316 315" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M157.501 -0.375c.742.001 1.485.003 2.25.004 41.15.181 78.576 15.968 108.25 44.371.794.731 1.588 1.462 2.406 2.215 29.232 27.798 43.678 68.157 45.594 107.785.042.866.085 1.732.128 2.625.907 38.674-12.972 75.152-39.128 103.375-4.967-4.116-9.413-8.421-13.75-13.188-4.308-4.681-8.661-9.279-13.188-13.75-4.236-4.185-8.234-8.502-12.062-13.062 1.493-4.098 3.504-7.642 5.75-11.375 14.298-24.536 17.301-51.331 10.125-78.625-6.84-24.226-22.8-45.474-44.625-58.125-24.226-13.508-51.139-18.299-78.25-10.875-25.238 7.793-47.258 23.513-60.099 47.01-12.72 24.393-16.77 51.233-8.776 77.865 8.162 25.691 25.058 47.235 48.876 60.125 25.272 12.52 50.193 13.401 77.124 6.452 2.122-.511 4.068-.656 6.251-.702 1.094-.039 1.094-.039 2.211-.078 7.183.976 11.623 6.139 16.437 11.058.746.751 1.492 1.501 2.261 2.274 2.371 2.388 4.731 4.785 7.091 7.184 1.61 1.625 3.22 3.249 4.832 4.873 3.939 3.972 7.869 7.952 11.793 11.939-1.829 4.096-4.339 5.969-8.063 8.312-.922.585-.922.585-1.863 1.181-20.514 12.547-43.771 16.949-67.512 16.882-.792-.001-1.585-.002-2.401-.004-39.504-.163-77.367-14.283-107.161-40.371-.85-.717-1.699-1.433-2.574-2.172-6.243-5.392-11.414-11.288-16.426-17.828-.679-.875-1.358-1.751-2.058-2.652-16.038-21.29-25.991-46.054-29.942-72.348-.184-1.198-.369-2.395-.559-3.629-5.044-42.041 7.495-84.2 33.348-117.406 25.808-32.312 62.412-52.91 103.332-58.55 6.791-.726 13.557-.811 20.379-.79z" fill="#00E8B5"/><path d="M197.996 108.172c11.459 9.836 19.935 23.768 22.004 38.828 1.423 20.213-1.924 37.808-15.375 53.5-11.737 12.119-27.337 19.347-44.223 19.854-17.665.159-33.4-4.782-46.34-17.094-12.451-12.439-18.945-28.175-19.437-45.76.524-16.655 6.342-32.414 18.102-44.395 24.369-22.569 58.384-24.422 85.269-4.933z" fill="#C74AE3"/></svg></a>
+          </div>
+        </td>
+      </tr>
 </tbody>
   </table>
 
   <div id="poolDirectoryToggleWrap" style="text-align: center; margin-top: 24px;">
-    <button id="poolDirectoryToggle" class="show-more-btn" type="button" onclick="togglePoolDirectory(this)">Show all 13 ↓</button>
+    <button id="poolDirectoryToggle" class="show-more-btn" type="button" onclick="togglePoolDirectory(this)">Show all 16 ↓</button>
   </div>
 
   <div style="text-align: center; margin-top: 48px;">
@@ -2299,7 +2372,7 @@ function togglePoolDirectory(btn) {
     if (expanded) r.classList.add('shown');
     else r.classList.remove('shown');
   });
-  btn.textContent = expanded ? 'Show less ↑' : 'Show all 13 ↓';
+  btn.textContent = expanded ? 'Show less ↑' : 'Show all 16 ↓';
 }
 </script>
 <script>
@@ -2555,6 +2628,9 @@ setInterval(fetchStakingData, 60000);
     { id: 'esmwvv7gercextd5qfcxaycbjnup236qzvnveru458l5', el: 'mcapDEPLOYR' },
     { id: 'amysyxr3rkdi6moaufp92nherth7hnzz1osxqziwmj9e', el: 'mcapAPE' },
     { id: 'cptjblrg4zxwstvnmrjv3bfgufcyt94x7rcimccgdryo', el: 'mcapFARTPRINT' },
+    { id: '9j9kr21w8eythiv13yszqy9y55hqi2uhzcqdwwwguze7', el: 'mcapBELEAF' },
+    { id: 'ew2yfmsvjexvqy8qnvmracdmh94skkdqskqez7bstzvt', el: 'mcapGAMBLR' },
+    { id: 'fmjnfz5kcd8c6pqa37zhtguhnbgudfoyemecr14einzz', el: 'mcapBILLI' },
   ];
 
   function fmtMcap(n) {
@@ -2613,6 +2689,9 @@ setInterval(fetchStakingData, 60000);
     { addr: '7rxvLcMnoejiqeP3tAZR184N5sus1fVPx4vufg5E3tCQ', el: 'pooledDEPLOYR', name: 'DEPLOYR', vaultAddr: '7rxvLcMnoejiqeP3tAZR184N5sus1fVPx4vufg5E3tCQ' },
     { addr: '6sXhgaRQDbY5MRDHxWsDPDFTWmHjPpedej43nAY1CqhZ', el: 'pooledAPE', name: 'APE', vaultAddr: '6sXhgaRQDbY5MRDHxWsDPDFTWmHjPpedej43nAY1CqhZ' },
     { addr: 'FzuLACSWjwN2iFvJt2CfHwPhCX44zsEryhLboCPLMKm2', el: 'pooledFARTPRINT', name: 'FARTPRINT', vaultAddr: 'FzuLACSWjwN2iFvJt2CfHwPhCX44zsEryhLboCPLMKm2' },
+    { addr: 'F1SSSD9uabGcMqEeZ97SWLxRxz5rHrz54VwARuDttPvg', el: 'pooledBELEAF', name: 'BELEAF', vaultAddr: 'F1SSSD9uabGcMqEeZ97SWLxRxz5rHrz54VwARuDttPvg' },
+    { addr: '7xPTRtoUG3pqFawwDzZuTrkzZ2hZAkg11DWNzYDsdurf', el: 'pooledGAMBLR', name: 'GAMBLR', vaultAddr: '7xPTRtoUG3pqFawwDzZuTrkzZ2hZAkg11DWNzYDsdurf' },
+    { addr: '5pMuYK89UNY7RE3bVG69KiXX8BDftiHTjEyfLA4H3ssm', el: 'pooledBILLI', name: 'BILLI', vaultAddr: '5pMuYK89UNY7RE3bVG69KiXX8BDftiHTjEyfLA4H3ssm' },
   ];
 
   function fmtTokens(n) {
@@ -2794,12 +2873,15 @@ const poolData = {
   'DEPLOYR':  { mcap: 0, pool: 0, change: 0 },
   'APE':      { mcap: 0, pool: 0, change: 0 },
   'FARTPRINT': { mcap: 0, pool: 0, change: 0 },
+  'BELEAF':   { mcap: 0, pool: 0, change: 0 },
+  'GAMBLR':   { mcap: 0, pool: 0, change: 0 },
+  'BILLI':    { mcap: 0, pool: 0, change: 0 },
 };
 
 // Map element IDs to pool keys
-const mcapMap = { 'mcap401k': '401k', 'mcapUP': 'UP', 'mcapBELIEF': 'BELIEF', 'mcapFACAI': 'FACAI', 'mcapMIP': 'MIP', 'mcapFLYWHEEL': 'FLYWHEEL', 'mcapPIC': 'PIC', 'mcapPOSTR': 'POSTR', 'mcapBRRRILLION': 'BRRRILLION', 'mcapMARMOT': 'MARMOT', 'mcapDEPLOYR': 'DEPLOYR', 'mcapAPE': 'APE', 'mcapFARTPRINT': 'FARTPRINT' };
-const poolMap = { 'pooled401k': '401k', 'pooledUP': 'UP', 'pooledBELIEF': 'BELIEF', 'pooledFACAI': 'FACAI', 'pooledMIP': 'MIP', 'pooledFLYWHEEL': 'FLYWHEEL', 'pooledPIC': 'PIC', 'pooledPOSTR': 'POSTR', 'pooledBRRRILLION': 'BRRRILLION', 'pooledMARMOT': 'MARMOT', 'pooledDEPLOYR': 'DEPLOYR', 'pooledAPE': 'APE', 'pooledFARTPRINT': 'FARTPRINT' };
-const changeMap = { 'change401k': '401k', 'changeUP': 'UP', 'changeBELIEF': 'BELIEF', 'changeFACAI': 'FACAI', 'changeMIP': 'MIP', 'changeFLYWHEEL': 'FLYWHEEL', 'changePIC': 'PIC', 'changePOSTR': 'POSTR', 'changeBRRRILLION': 'BRRRILLION', 'changeMARMOT': 'MARMOT', 'changeDEPLOYR': 'DEPLOYR', 'changeAPE': 'APE', 'changeFARTPRINT': 'FARTPRINT' };
+const mcapMap = { 'mcap401k': '401k', 'mcapUP': 'UP', 'mcapBELIEF': 'BELIEF', 'mcapFACAI': 'FACAI', 'mcapMIP': 'MIP', 'mcapFLYWHEEL': 'FLYWHEEL', 'mcapPIC': 'PIC', 'mcapPOSTR': 'POSTR', 'mcapBRRRILLION': 'BRRRILLION', 'mcapMARMOT': 'MARMOT', 'mcapDEPLOYR': 'DEPLOYR', 'mcapAPE': 'APE', 'mcapFARTPRINT': 'FARTPRINT', 'mcapBELEAF': 'BELEAF', 'mcapGAMBLR': 'GAMBLR', 'mcapBILLI': 'BILLI' };
+const poolMap = { 'pooled401k': '401k', 'pooledUP': 'UP', 'pooledBELIEF': 'BELIEF', 'pooledFACAI': 'FACAI', 'pooledMIP': 'MIP', 'pooledFLYWHEEL': 'FLYWHEEL', 'pooledPIC': 'PIC', 'pooledPOSTR': 'POSTR', 'pooledBRRRILLION': 'BRRRILLION', 'pooledMARMOT': 'MARMOT', 'pooledDEPLOYR': 'DEPLOYR', 'pooledAPE': 'APE', 'pooledFARTPRINT': 'FARTPRINT', 'pooledBELEAF': 'BELEAF', 'pooledGAMBLR': 'GAMBLR', 'pooledBILLI': 'BILLI' };
+const changeMap = { 'change401k': '401k', 'changeUP': 'UP', 'changeBELIEF': 'BELIEF', 'changeFACAI': 'FACAI', 'changeMIP': 'MIP', 'changeFLYWHEEL': 'FLYWHEEL', 'changePIC': 'PIC', 'changePOSTR': 'POSTR', 'changeBRRRILLION': 'BRRRILLION', 'changeMARMOT': 'MARMOT', 'changeDEPLOYR': 'DEPLOYR', 'changeAPE': 'APE', 'changeFARTPRINT': 'FARTPRINT', 'changeBELEAF': 'BELEAF', 'changeGAMBLR': 'GAMBLR', 'changeBILLI': 'BILLI' };
 
 // Parse a percent string like "+12.3%" or "-4.5%" -> signed number
 function parsePercentValue(text) {
@@ -2899,6 +2981,9 @@ function doSort() {
     '$DEPLOYR': 'DEPLOYR',
     '$APE': 'APE',
     '$FARTPRINT': 'FARTPRINT',
+    '$BELEAF': 'BELEAF',
+    '$GAMBLR': 'GAMBLR',
+    '$BILLI': 'BILLI',
   };
   
   rows.sort((a, b) => {
@@ -2914,6 +2999,23 @@ function doSort() {
 
   // Re-append sorted rows
   rows.forEach(row => tbody.appendChild(row));
+
+  // Reassign hidden-row class based on the NEW sorted order so the
+  // top 10 pools are always the ones visible by default, regardless
+  // of which rows started life as hidden in the static HTML.
+  const VISIBLE_COUNT = 10;
+  const toggleBtn = document.getElementById('poolDirectoryToggle');
+  const isExpanded = !!(toggleBtn && toggleBtn.classList.contains('expanded'));
+  rows.forEach((row, idx) => {
+    if (idx < VISIBLE_COUNT) {
+      row.classList.remove('hidden-row');
+      row.classList.remove('shown');
+    } else {
+      row.classList.add('hidden-row');
+      if (isExpanded) row.classList.add('shown');
+      else row.classList.remove('shown');
+    }
+  });
 }
 
 // Initialize
@@ -2964,6 +3066,9 @@ window.addEventListener('load', () => {
     { key: 'DEPLOYR', pair: 'esmwvv7gercextd5qfcxaycbjnup236qzvnveru458l5' },
     { key: 'APE', pair: 'amysyxr3rkdi6moaufp92nherth7hnzz1osxqziwmj9e' },
     { key: 'FARTPRINT', pair: 'cptjblrg4zxwstvnmrjv3bfgufcyt94x7rcimccgdryo' },
+    { key: 'BELEAF', pair: '9j9kr21w8eythiv13yszqy9y55hqi2uhzcqdwwwguze7' },
+    { key: 'GAMBLR', pair: 'ew2yfmsvjexvqy8qnvmracdmh94skkdqskqez7bstzvt' },
+    { key: 'BILLI', pair: 'fmjnfz5kcd8c6pqa37zhtguhnbgudfoyemecr14einzz' },
   ];
 
   // Cache resolved mint addresses so we don't repeat work
@@ -3064,7 +3169,7 @@ function copyTokenCA(btn) {
 <script>
 // Aggregate totals: Total $POOL Staked + Total $POOL Pooled (sum across all 6 directory rows)
 (function aggregateTotals() {
-  const pooledIds = ['pooled401k', 'pooledUP', 'pooledBELIEF', 'pooledFACAI', 'pooledMIP', 'pooledFLYWHEEL', 'pooledPIC', 'pooledPOSTR', 'pooledBRRRILLION', 'pooledMARMOT', 'pooledDEPLOYR', 'pooledAPE', 'pooledFARTPRINT'];
+  const pooledIds = ['pooled401k', 'pooledUP', 'pooledBELIEF', 'pooledFACAI', 'pooledMIP', 'pooledFLYWHEEL', 'pooledPIC', 'pooledPOSTR', 'pooledBRRRILLION', 'pooledMARMOT', 'pooledDEPLOYR', 'pooledAPE', 'pooledFARTPRINT', 'pooledBELEAF', 'pooledGAMBLR', 'pooledBILLI'];
   const stakedId = 'stakedAmount';
   const totalStakedEl = document.getElementById('totalStakedStat');
   const totalPooledEl = document.getElementById('totalPooledStat');
@@ -3157,6 +3262,9 @@ function copyTokenCA(btn) {
     { key: 'DEPLOYR',  ticker: '$DEPLOYR',  pooledId: 'pooledDEPLOYR' },
     { key: 'APE',      ticker: '$APE',      pooledId: 'pooledAPE' },
     { key: 'FARTPRINT', ticker: '$FARTPRINT', pooledId: 'pooledFARTPRINT' },
+    { key: 'BELEAF',   ticker: '$BELEAF',   pooledId: 'pooledBELEAF' },
+    { key: 'GAMBLR',   ticker: '$GAMBLR',   pooledId: 'pooledGAMBLR' },
+    { key: 'BILLI',    ticker: '$BILLI',    pooledId: 'pooledBILLI' },
   ];
 
   // Parse text like "1.23M $POOL" -> raw number
@@ -3296,7 +3404,7 @@ function copyTokenCA(btn) {
       // A horizontal chord across the bubble at vertical center = 2r, but text
       // sits above/below center so we use a slightly narrower chord to be safe,
       // and reserve ~10% for inner padding.
-      const innerPad = 0.86;
+      const innerPad = 0.80;
       // The chord at the text's vertical offset from center is 2 × √(r² − dy²).
       // For the ticker, the text baseline sits roughly r*0.15 from center when
       // the icon is visible, more when it isn't. Use a conservative estimate.
@@ -3309,14 +3417,16 @@ function copyTokenCA(btn) {
       const tickerCap = r * 0.40;
       const valueCap  = r * 0.26;
 
-      const tickerSize = Math.max(8, Math.min(tickerCap, fitFontSize(b.ticker, tickerChord, '800', 'Syne, sans-serif')));
-      const valueSize  = Math.max(7, Math.min(valueCap,  fitFontSize(valueText, valueChord, '700', '"Space Mono", monospace')));
+      // Allow text to shrink as small as the bubble actually needs — clamping at
+      // a pixel floor was causing long tickers like $BILLI to overflow on small bubbles.
+      const tickerSize = Math.max(6, Math.min(tickerCap, fitFontSize(b.ticker, tickerChord, '800', 'Syne, sans-serif')));
+      const valueSize  = Math.max(6, Math.min(valueCap,  fitFontSize(valueText, valueChord, '700', '"Space Mono", monospace')));
 
       b.tickerEl.style.fontSize = tickerSize + 'px';
       b.valueEl.style.fontSize  = valueSize + 'px';
 
       // Hide the value text only when the bubble truly can't fit it readably
-      b.valueEl.style.display = (valueSize < 8) ? 'none' : '';
+      b.valueEl.style.display = (valueSize < 6) ? 'none' : '';
     });
   }
 
